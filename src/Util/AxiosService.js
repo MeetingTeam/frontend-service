@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ACCESS_TOKEN } from "./Constraints.js";
 
 class AxiosService{
           constructor(){
@@ -7,14 +8,15 @@ class AxiosService{
                     this.instance=instance;
                     this.isTokenExpired=false;
           }
+          
           handleSuccess=(res)=>{
                     this.isTokenExpired=false;
                     return res;
           }
+          
           handleError=(err)=>{   
                     const res=err.response;         
-                    if(res&&res.status==401&&res.data=="JWT expired"){
-                              console.log("This", this);
+                    if(res&&res.status==401){
                               if(!this.isTokenExpired){
                                         this.isTokenExpired=true;
                                         window.location.replace("/login");                            
@@ -23,21 +25,65 @@ class AxiosService{
                     }
                     else return Promise.reject(err);
           }
-          get=(url)=>{
-                    return this.instance.get(url,{withCredentials: true})
+
+          async #getAccessToken() {
+                    try{
+                              const session = await Auth.currentSession();
+                              return session.getAccessToken().getJwtToken();
+                    }
+                    catch(err){
+                              return "";
+                    }
           }
-          post=(url, body, isJSON)=>{
-                   if(isJSON) return this.instance.post(url, body,{
-                                        headers: {"Content-Type":"application/json"},
-                                        withCredentials: true
-                                        });
-                    else return this.instance.post(url, body,{withCredentials: true});
+          
+          async get(url, params){
+                    const accessToken= await this.#getAccessToken();
+                    return this.instance.get(url,{
+                              headers: { 'Authorization': accessToken,
+                              params: params
+                    }})
           }
-          put=(url, body)=>{
-                    return this.instance.put(url,body,{withCredentials: true})
+          
+          async post(url, body, params) {
+                    const accessToken= await this.#getAccessToken();
+                   return this.instance.post(url, body,{
+                                        headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Authorization': accessToken
+                                        },
+                                        params: params
+                              });
           }
-          delete=(url)=>{
-                    return this.instance.delete(url,{withCredentials: true});
+          
+          async put(url, body, params){
+                    const accessToken= await this.#getAccessToken();
+                    return this.instance.put(url, body,{
+                                        headers: { 
+                                                  'Content-Type': 'application/json',
+                                                  'Authorization': accessToken,
+                                        },
+                                        params: params
+                              }
+                    )
+          }
+
+          async patch(url, body, params){
+                    const accessToken= await this.#getAccessToken();
+                    return this.instance.patch(url,body,{
+                              headers: { 
+                                        'Content-Type': 'application/json',
+                                        'Authorization': accessToken,
+                              },
+                              params: params
+                    })
+          }
+          
+          async delete(url, params){
+                    const accessToken= await this.#getAccessToken();
+                    return this.instance.delete(url,{
+                              headers: { 'Authorization': accessToken },
+                              params: params
+                    });
           }
 }
 export default new AxiosService();

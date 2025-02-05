@@ -57,6 +57,11 @@
   },
   "react-dotenv": {
     "whitelist": [
+      "USER_SERVICE_ENDPOINT",
+      "TEAM_SERVICE_ENDPOINT",
+      "CHAT_SERVICE_ENDPOINT",
+      "MEETING_SERVICE_ENDPOINT",
+      "WEBSOCKET_SERVICE_ENDPOINT",
       "API_ENDPOINT",
       "AWS_REGION",
       "COGNITO_USER_POOL_ID",

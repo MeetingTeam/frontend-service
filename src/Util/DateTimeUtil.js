@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export function getTimeDistance(input){
+export function getTimeDistance(input) {
           if(!input) return "";
           const inputDate=new Date(input);
           const now=new Date();
@@ -16,6 +16,7 @@ export function getTimeDistance(input){
                     }
           }
 }
+
 export function getDateTime(input){
           if(!input) return "";
           const now=new Date();
@@ -27,6 +28,7 @@ export function getDateTime(input){
           time=time+", "+inputDate.getDate()+"/"+inputDate.getMonth()+"/"+inputDate.getFullYear();
           return time;
 }
+
 export function getScheduledTime(meeting){
           const {scheduledTime, scheduledDaysOfWeek, endDateString}=meeting;
           if(!scheduledTime) return "";
@@ -45,21 +47,25 @@ export function getScheduledTime(meeting){
           }
           else return "schedule meeting at "+ time.format("DD-MM-YYYY , HH:mm");
 }
-export const getDate = (inputDateTime) => {
+
+export function getDate(inputDateTime) {
           if (!inputDateTime) return null;
           let d = moment(inputDateTime);
           return d.format('YYYY-MM-DD');
 }
-export const getTime = (inputDateTime) => {
+
+export function getTime(inputDateTime) {
           if (!inputDateTime) return null;
           let d = moment(inputDateTime);
           return d.format('HH:mm');
 }
-export const getHour=(num)=>{
+
+export function getHour(num) {
           if(num<=12) return `${num} AM`;
           else return `${num-12} PM`;
 }
-export const getCalendarTime=(dateTime)=>{
+
+export function getCalendarTime(dateTime) {
           var result="";
           var hour=dateTime.getHours();
           if(hour<=12) result = (hour+":"+dateTime.getMinutes()+" AM");

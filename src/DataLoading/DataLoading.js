@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addFriendChatMessage, deleteFriend, loadFriends, updateFriendStatus, updateFriends} from "../Redux/friendsReducer.js";
 import { connectWebsocket, disconnect, subscribeToNewTopic, unsubscribeByTeamId} from "../Util/WebSocketService.js";
-import { getJoinedTeams } from "../API/TeamAPI.js";
+import { getJoinedTeams } from "../old-API/TeamAPI.js";
 import {addTeamChatMessage, deleteMeeting, deleteTeam, loadTeams, removeChannel, updateChannels, updateMeetings, updateMembers, updateTeam} from "../Redux/teamsReducer.js";
-import { getFriends, getUserInfo } from "../API/UserAPI.js";
+import { getFriends, getUserInfo } from "../old-API/UserAPI.js";
 import { loadUser } from "../Redux/userReducer.js";
 import { useEffect } from "react";
 
@@ -27,6 +27,7 @@ const DataLoading=({children})=>{
             dispatch(loadTeams(res.data))
         })
   },[])
+  
   useEffect(()=>{
     if(user.id){
           let url="/topic/user."+user.id;
