@@ -1,11 +1,11 @@
-import { CHAT_SERVICE_ENDPOINT } from "../../Util/EnvStore.js";
-import AxiosService from "./AxiosService";
+import AxiosService from "../../Services/AxiosService.js";
+import { CHAT_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const messageEndpoint = CHAT_SERVICE_ENDPOINT+"/message";
 
 class MessageAPI {
-    receiveMessage(messageDto) {
-        return AxiosService.post(messageEndpoint, messageDto);
+    sendTextMessage(messageDto) {
+        return AxiosService.post(messageEndpoint+"/text_message", messageDto);
     }
 
     reactMessage(reactionDto) {
@@ -14,6 +14,20 @@ class MessageAPI {
 
     unsendMessage(messageId) {
         return AxiosService.put(`${messageEndpoint}/unsend/${messageId}`);
+    }
+
+    getPrivateMessages(receivedMessageNum, friendId){
+        return AxiosService.get(`${messageEndpoint}/private`, {
+            receivedMessageNum,
+            friendId
+        });
+    }
+
+    getTextChannelMessages(receivedMessageNum, channelId){
+        return AxiosService.get(`${messageEndpoint}/text_channel`, {
+            receivedMessageNum,
+            channelId
+        });
     }
 }
 

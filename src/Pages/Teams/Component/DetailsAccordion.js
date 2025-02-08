@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { tabTitles } from "../../../Util/Constraints.js";
+import { tabTitles } from "../../../Utils/Constraints.js";
 
 const DetailsAccordion=({team,setChannelInfo, channelInfo})=>{
           const teams=useSelector(state=>state.teams);

@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { messageTypes } from "../Utils/Constraints.js";
 
 const teamsReducer=createSlice({
           name: "teams",
-          initialState:[],
+          initialState: null,
           reducers:{
                     loadTeams:(state, action)=>{
                               return action.payload;
                     },
                     addTeamChatMessage:(state,action)=>{
-                              const {teamId, message}=action.payload;
-                              const teamIndex=state.findIndex((team)=>team.id==teamId);
+                              const message=action.payload;
+                              const teamIndex=state.findIndex((team)=>team.id==message.teamId);
                               if(teamIndex>-1){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==message.channelId);
                                         if(channelIndex>-1){
@@ -17,8 +18,7 @@ const teamsReducer=createSlice({
                                                   if(channel.messages){
                                                             let messIndex=channel.messages.findIndex(mess=>mess.id==message.id);
                                                             if(messIndex>-1){
-                                                                      if(message.messageType=="VOTING"){
-                                                                                console.log("Voting message",message);
+                                                                      if(message.type==messageTypes.VOTING){
                                                                                 channel.messages=channel.messages.filter(mess=>mess.id!=message.id);
                                                                                 channel.messages.push(message);
                                                                       }                                                         
@@ -63,10 +63,9 @@ const teamsReducer=createSlice({
                               return state;
                     },
                     updateMeetings:(state, action)=>{
-                              let {teamId, meeting}=action.payload;
+                              let meeting=action.payload;
                               meeting.scheduledDaysOfWeek=new Set(meeting.scheduledDaysOfWeek||[]);
-                              meeting.emailsReceivedNotification=new Set(meeting.emailsReceivedNotification||[])
-                              let teamIndex=state.findIndex(team=>team.id==teamId);
+                              let teamIndex=state.findIndex(team=>team.id==meeting.teamId);
                               if(teamIndex>-1){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==meeting.channelId);
                                         if(channelIndex>-1){
@@ -105,12 +104,15 @@ const teamsReducer=createSlice({
                               const {teamId,newMembers}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
                               const members=state[teamIndex].members;
-                              newMembers.forEach(newMember=> {
-                                        const memberIndex=members.findIndex(member=>member.u.id==newMember.u.id);
-                                        if(memberIndex>=0) members[memberIndex]=newMember;
-                                        else members.push(newMember);
-                              });
-                              state[teamIndex].members=members;
+                              if(members){
+                                        newMembers.forEach(newMember=> {
+                                                  const memberIndex=members.findIndex(member=>member.u.id==newMember.u.id);
+                                                  if(memberIndex>=0) members[memberIndex]=newMember;
+                                                  else members.push(newMember);
+                                        });
+                                        state[teamIndex].members=members;
+                              }
+                              else state[teamIndex].members= newMembers;
                     },
                     updateChannels:(state, action)=>{
                               const {teamId, newChannel}=action.payload;

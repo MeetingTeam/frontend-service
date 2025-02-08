@@ -1,8 +1,12 @@
-import AxiosService from "../../Util/AxiosService.js";
-import { CHAT_SERVICE_ENDPOINT } from "../../Util/EnvStore.js";
+import AxiosService from "../../Services/AxiosService.js";
+import { CHAT_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const votingEndpoint= CHAT_SERVICE_ENDPOINT+"/voting"
 class VotingAPI {
+          sendVotingMessage(messageDto){
+                    return AxiosService.post(votingEndpoint, messageDto);
+          }
+
           chooseOption(optionDto){
                     return AxiosService.post(`${votingEndpoint}/choose-option`, optionDto);
           }

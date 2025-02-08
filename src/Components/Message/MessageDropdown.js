@@ -1,42 +1,54 @@
 import { useSelector } from "react-redux";
-import { reactMessage, unsendMessage } from "../../Util/WebSocketService.js";
+import { messageTypes } from "../../Utils/Constraints.js";
+import MessageAPI from "../../APIs/chat-service/MessageAPI.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
+import "./Message.css"
 
-const MessageDropdown=({message, setTextMessage, setReplyMessage})=>{
+const MessageDropdown=({message, setTextContent, setReplyMessage})=>{
           const user=useSelector(state=>state.user);
-          if(message.messageType=="UNSEND") return "";
+          const { showErrorMessage } = useSnackbarUtil();
+          if(message.messageType==messageTypes.TEXT) return;
+
           function handleDropdownItem(e){
               e.preventDefault();
               var name=e.target.name;
-              if(name=="Edit") setTextMessage(message.content);
+              if(name=="Edit") setTextContent(message.content);
               else if(name=="Reply") setReplyMessage(message);
-              else if(name=="Delete"){
-                  unsendMessage(message.id);
+              else if(name=="Unsend"){
+                  MessageAPI.unsendMessage(message.id)
+                    .catch(err=>showErrorMessage(handleAxiosError(err)));
               }
           }
-          const emojiCodes = ["2764", "1F600", "1F641", "1F642"];
+
+          const emojiCodes = ["❤️", "😀", "🙁", "🙂"];
           function handleEmoji(e,emojiCode){
-              e.preventDefault();
-              reactMessage(message.id, {
-                    userId: user.id,
+                e.preventDefault();
+                MessageAPI.reactMessage({
+                    messageId: message.id,
                     emojiCode: emojiCode
-              })
+                })
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
+          
           return(
               <div className="dropdown">
                   <button className="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                  <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                          {message.messageType=="TEXT"&&<li><a className="dropdown-item" name="Edit" onClick={(e)=>handleDropdownItem(e)}>Edit</a></li>}
-                          <li><a className="dropdown-item" name="Reply" onClick={(e)=>handleDropdownItem(e)}>Reply</a></li>
-                          {message.senderId==user.id&&<li><a className="dropdown-item" name="Delete" onClick={(e)=>handleDropdownItem(e)}>Delete</a></li>}
-                          <li>
-                                  <div className="d-flex align-items-center bg-light rounded-pill p-2 reaction-list">
-                                      {emojiCodes.map((code, index)=>
-                                          <span className="fs-4 me-2" key={index} onClick={(e)=>handleEmoji(e, code)}>{String.fromCodePoint(`0x${code}`)}</span>
+                  <div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                          {message.type==messageTypes.TEXT&&
+                            <button className="dropdown-item" name="Edit" onClick={(e)=>handleDropdownItem(e)}>Edit</button>}
+                          <button className="dropdown-item" name="Reply" onClick={(e)=>handleDropdownItem(e)}>Reply</button>
+                          {message.senderId==user.id&&
+                            <button className="dropdown-item" name="Unsend" onClick={(e)=>handleDropdownItem(e)}>Unsend</button>}
+                          <div>
+                                  <div className="d-flex align-items-center bg-light rounded-pill reaction-list">
+                                      {emojiCodes.map((emojiCode, index)=>
+                                          <span className="fs-4 me-2" key={index} onClick={(e)=>handleEmoji(e, emojiCode)}><small>{emojiCode}</small></span>
                                       )}
-                                      <span className="fs-4 me-2" onClick={(e)=>handleEmoji(e, null)}>X</span>
+                                      <span className="fs-4 me-2" onClick={(e)=>handleEmoji(e, null)}><small>X</small></span>
                                   </div> 
-                              </li>
-                  </ul>
+                              </div>
+                  </div>
               </div>
           )
       }

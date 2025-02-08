@@ -2,19 +2,25 @@
     background: #fff;
     transition: .5s;
     border: 0;
-    margin-bottom: 30px;
     border-radius: .55rem;
     position: relative;
-    width: 100%;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
 }
-.chat-app .people-list {
+
+.chat-app .friends-management {
     width: 280px;
     position: absolute;
-    left: 0;
-    top: 0;
-    padding: 20px;
     z-index: 7
+}
+
+.friends-management .friends-control {
+    padding: 10px;
+}
+
+.friends-management .friends-list {
+    padding: 0px 10px;
+    width: 100%;
+    overflow-y: scroll;
 }
 
 .chat-app .chat {
@@ -22,56 +28,57 @@
     border-left: 1px solid #eaeaea
 }
 
-.people-list {
+.friends-management {
     -moz-transition: .5s;
     -o-transition: .5s;
     -webkit-transition: .5s;
     transition: .5s
 }
 
-.people-list .chat-list li {
+.friends-management .chat-list li {
     padding: 10px 15px;
     list-style: none;
     border-radius: 3px
 }
 
-.people-list .chat-list li:hover {
+.friends-management .chat-list li:hover {
     background: #efefef;
     cursor: pointer
 }
 
-.people-list .chat-list li.active {
+.friends-management .chat-list li.active {
     background: #efefef
 }
 
-.people-list .chat-list li .name {
+.friends-management .chat-list li .name {
     font-size: 15px
 }
 
-.people-list .chat-list img {
+.friends-management .chat-list img {
     width: 45px;
     border-radius: 50%
 }
 
-.people-list img {
+.friends-management img {
     float: left;
     border-radius: 50%
 }
 
-.people-list .about {
+.friends-management .about {
     float: left;
     padding-left: 8px
 }
 
-.people-list .status {
+.friends-management .status {
     color: #999;
     font-size: 13px
 }
 
 .chat .chat-header {
-    padding: 10px 15px;
+    padding: 5px 15px;
     border-bottom: 2px solid #f4f7f6
 }
+
 
 .chat .chat-header img {
     float: left;
@@ -95,7 +102,7 @@
 
 .chat .chat-history ul li {
     list-style: none;
-    margin-bottom: 30px
+    margin-bottom: 30px !important
 }
 
 .chat .chat-history ul li:last-child {
@@ -171,8 +178,8 @@
     height: 500px;
     overflow-y: scroll;
 }
-.chat .chat-message {
-    padding: 10px
+.chat .chat-control {
+    padding: 5px
 }
 
 .online,

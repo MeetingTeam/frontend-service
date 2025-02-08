@@ -1,19 +1,7 @@
 import { Col, Modal, Row } from "react-bootstrap";
-import "./Message.css"
-export const ReactionList=({reactions, setReactions})=>{
-          if(!reactions) return;
-          const reactionList=new Set();
-          reactions.forEach((reaction)=>{
-                    reactionList.add(reaction.emojiCode);
-          })
-          if(reactionList.size>0)
-                    return(
-                              <div className="reaction" onClick={(e)=>setReactions(reactions)}>
-                              {Array.from(reactionList).map(code=>String.fromCodePoint(`0x${code}`))} {reactions.length}
-                              </div>
-                    )
-}
-export const ReactionDetails=({reactions, people, setShow})=>{
+import Avatar from "../Avatar/Avartar.js";
+
+const ReactionDetails=({reactions, people, setShow})=>{
           return(
           <Modal show={reactions} onHide={()=>setShow(null)}>
                     <Modal.Header closeButton>
@@ -26,10 +14,10 @@ export const ReactionDetails=({reactions, people, setShow})=>{
                                         return(
                                                   <Row key={owner.id}>
                                                             <Col lg="2">
-                                                                      <img src={owner.urlIcon} alt="avatar" width="30px" height="30px"/>
+                                                                      <Avatar src={owner.urlIcon}/>
                                                             </Col>
                                                             <Col lg="8">{owner.nickName}</Col>
-                                                            <Col lg="2">{String.fromCodePoint(`0x${reaction.emojiCode}`)}</Col>
+                                                            <Col lg="2">{reaction.emojiCode}</Col>
                                                   </Row>
                                         )
                              })}
@@ -37,3 +25,5 @@ export const ReactionDetails=({reactions, people, setShow})=>{
           </Modal>
           )
 }
+
+export default ReactionDetails;

@@ -16,11 +16,12 @@ const VideoChannel=({team, channel, channelInfo})=>{
           const [reactions, setReactions]=useState(null);
           const [meetingDTO, setMeetingDTO]=useState(null);
           useEffect(()=>{
-                    if(!channel.meetings)
-                    getVideoChannelMeetings(channel.id,0).then(res=>{
-                              dispatch(loadChannelMeetings({channelInfo, meetings:res.data}))
-                    })
-                    .catch(err=>alert(err));
+                    if(!channel.meetings){
+                      getVideoChannelMeetings(channel.id,0).then(res=>{
+                        dispatch(loadChannelMeetings({channelInfo, meetings:res.data}))
+                      })
+                      .catch(err=>alert(err));
+                    }
           },[channel])
           function handleScheduleButton(e){
             e.preventDefault();
@@ -58,7 +59,7 @@ const VideoChannel=({team, channel, channelInfo})=>{
             {meetingDTO&&<MeetingModal meeting={meetingDTO} setShow={setMeetingDTO}/>}
           <div className="chat-history">
                     <button className="btn btn-success" onClick={handleAddMeetingsButton}>See more meetings</button>
-                    {channel.meetings.map(meeting=>{
+                    {team.members&&channel.meetings?.map(meeting=>{
                               let owner=null;
                               if(meeting.creatorId==user.id) owner=user;
                               else{

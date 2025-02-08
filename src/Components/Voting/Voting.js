@@ -1,12 +1,13 @@
 import { useSelector } from "react-redux";
-import { getDateTime } from "../../Util/DateTimeUtil.js";
 import "./Voting.css";
-import { blockVoting } from "../../old-API/VoteAPI.js";
+import VotingAPI from "../../APIs/chat-service/VotingAPI.js";
+import { alertError } from "../../Utils/ToastUtil.js";
+import { getDateTime } from "../../Utils/DateTimeUtil.js";
 
 const Voting=({message,creatorNickName,setShow})=>{
           const user=useSelector(state=>state.user);
           function handleBlockBtn(){
-            blockVoting(message.id).catch(err=>alert(err));
+            VotingAPI.blockVoting(message.id).catch(err=>alertError(err));
           }
           let voteNum=0;
           for(let option of message.voting.options) voteNum+=option.userIds.length;

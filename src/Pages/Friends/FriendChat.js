@@ -1,94 +1,116 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getDateTime, getTimeDistance } from "../../Util/DateTimeUtil.js";
+import { getDateTime, getTimeDistance } from "../../Utils/DateTimeUtil.js";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import MessageDropdown from "../../Components/Message/MessageDropdown.js";
-
 import ReplyAlert from "../../Components/Message/ReplyAlert.js";
-import { sendPrivateMessage } from "../../Util/WebSocketService.js";
-
-import { getPrivateMessages, sendPrivateFileMessage } from "../../old-API/ChatAPI.js";
 import { loadMoreMessages } from "../../Redux/friendsReducer.js";
 import EmojiPicker from "emoji-picker-react";
-import { ReactionDetails, ReactionList} from "../../Components/Message/Reaction.js";
 import MessageType from "../../Components/Message/MessageType.js";
 import Avatar from "../../Components/Avatar/Avartar.js";
 import UnfriendModal from "./Components/UnfriendModal.js";
+import MessageAPI from "../../APIs/chat-service/MessageAPI.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
+import ReactionDetails from "../../Components/Message/ReactionDetails.js";
+import ReactionList from "../../Components/Message/ReactionList.js";
+import MediaFileAPI from "../../APIs/chat-service/MediaFileAPI.js";
+import EmojiPickerPopover from "../../Components/ChatControl/EmojiPickerPopover.js";
 
 
 const FriendChat=({friend, indexChatFriend})=>{
           const dispatch=useDispatch();
+          const { showErrorMessage } = useSnackbarUtil();
           const user=useSelector(state=>state.user);
-          const [textMessage, setTextMessage]=useState("");
+          const [textContent, setTextContent]=useState("");
           const [replyMessage, setReplyMessage]=useState(null);
-          const [showEmojiPicker, setShowEmojiPicker]=useState(false);
           const [reactions, setReactions]=useState(null);
           const [showUnfriend, setShowUnfriend]=useState(false);
           const target = useRef(null);
+          
           useEffect(()=>{
                 if(!friend.messages){
-                    getPrivateMessages(0, friend.id).then(res=>{
+                    MessageAPI.getPrivateMessages(0, friend.id).then(res=>{
                         dispatch(loadMoreMessages({messages: res.data,friendIndex: indexChatFriend}))
                     })
+                    .catch(err=>showErrorMessage(handleAxiosError(err)));
                 }
           },[])
+          
           function submitMessage(e){
                 e.preventDefault();
-                if(textMessage=="") return;
+                if(textContent=="") return;
                 const chatMessage={
-                    senderId: user.id,
                     recipientId: friend.id,
-                    content: textMessage,
-                    messageType: "TEXT",
-                    createdAt: new Date(),
+                    content: textContent
                 }
                 if(replyMessage){
                     chatMessage.parentMessageId=replyMessage.id;
                     setReplyMessage(null);
                 }
-                sendPrivateMessage(chatMessage);
-                setTextMessage("");
+                MessageAPI.sendTextMessage(chatMessage)
+                        .catch(err=>showErrorMessage(handleAxiosError(err)));
+                setTextContent("");
           }
           function handleAddMessagesButton(e){
                e.preventDefault();
                let limit=friend.messages?friend.messages.length:0;
-                getPrivateMessages(limit, friend.id).then(res=>{
-                        dispatch(loadMoreMessages({messages: res.data, friendIndex: indexChatFriend}))
+               MessageAPI.getPrivateMessages(limit, friend.id).then(res=>{
+                        dispatch(loadMoreMessages({
+                            messages: res.data, 
+                            friendIndex: indexChatFriend
+                    }))
                 })
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleUpload(e){
                 const file=e.target.files[0];
-                const message={
-                    senderId: user.id,
-                    recipientId: friend.id,
-                    createdAt: new Date()
+                if(!file) {
+                    showErrorMessage("File is not choosen. Please try again");
+                    return;
                 }
-                sendPrivateFileMessage(message, file);
+                if(file.size>100000000) {
+                    showErrorMessage("File too big");
+                    return;
+                }
+                MediaFileAPI.uploadFileToS3(file).then(presignedUrl=>{
+                        const fileMessage={
+                            recipientId: friend.id,
+                            mediaFile: {
+                                fileUrl: presignedUrl,
+                                fileType: file.type,
+                                fileSizeInBytes: file.size
+                            }
+                        }
+                        MediaFileAPI.sendFileMessage(fileMessage)
+                            .catch(()=> showErrorMessage("Failed to uplaod file"));
+                })
+                .catch(()=> showErrorMessage("Failed to upload file"));
                 e.target.value="";
           }
-          function handleEmojiPicker(emojiData, e){
-                setTextMessage(prev=>prev+emojiData.emoji);
+          function handleEmojiPicker(emojiData){
+                setTextContent(prev=>prev+emojiData.emoji);
           }
           return(
             <>
-                {reactions&&<ReactionDetails reactions={reactions} people={[user, friend]} setShow={setReactions}/>}
+                {reactions&&<ReactionDetails  reactions={reactions} people={[user, friend]} setShow={setReactions}/>}
                 {showUnfriend&&<UnfriendModal friend={friend} setShow={setShowUnfriend}/>}
                 <div className="chat">
                     <div className="chat-header clearfix">
                         <div className="row">
                             <div className="col-lg-6">
-                                <Avatar src={friend.urlIcon}/>
-                                <div className="chat-about">
-                                    <h6 className="m-b-0">{friend.nickName}</h6>
-                                    <small>Last seen: {getTimeDistance(friend.lastActive)}</small>
+                                    <Avatar src={friend.urlIcon}/>
+                                    <div className="chat-about">
+                                        <h6 className="mb-0">{friend.nickName}</h6>
+                                        <small>Last seen: {getTimeDistance(friend.lastActive)}</small>
+                                    </div>
+                                </div>
+                                <div className="col-lg-6 hidden-sm text-end">
+                                    <Link to="#" onClick={()=>setShowUnfriend(true)} className="btn btn-outline-secondary"><i className="fa fa-hand-paper-o" aria-hidden="true"></i></Link>
+                                    <Link to="#" className="btn btn-outline-primary"><i className="fa fa-phone"></i></Link>
                                 </div>
                             </div>
-                            <div className="col-lg-6 hidden-sm text-end">
-                                <Link to="#" onClick={()=>setShowUnfriend(true)} className="btn btn-outline-secondary"><i className="fa fa-hand-paper-o" aria-hidden="true"></i></Link>
-                                <Link to="#" className="btn btn-outline-primary"><i className="fa fa-phone"></i></Link>
-                            </div>
                         </div>
-                    </div>
                     <div className="chat-history">
                         <button className="btn btn-success" onClick={(e)=>handleAddMessagesButton(e)}>See more messages</button>
                         <ul className="m-b-0">
@@ -106,7 +128,9 @@ const FriendChat=({friend, indexChatFriend})=>{
                                             <li className="clearfix" key={message.id}>
                                                 <div className="message-data text-begin">
                                                     <Avatar src={friend.urlIcon}/>
-                                                    <span className="message-data-time">{getDateTime(message.createdAt)}</span>
+                                                    <span className="message-data-time">
+                                                        <small>{getDateTime(message.createdAt)}</small>
+                                                    </span>
                                                 </div>
                                                 <div className="message-data d-flex justify-content-begin">
                                                         <div className="message other-message">
@@ -115,17 +139,19 @@ const FriendChat=({friend, indexChatFriend})=>{
                                                                 <MessageType message={message}/>
                                                                 <ReactionList reactions={message.reactions} setReactions={setReactions}/>
                                                          </div>
-                                                         <MessageDropdown message={message} setTextMessage={setTextMessage} setReplyMessage={setReplyMessage}/>
+                                                         <MessageDropdown message={message} setTextContent={setTextContent} setReplyMessage={setReplyMessage}/>
                                                     </div>
                                             </li>  
                                         )
                                     else return(
                                         <li className="clearfix" key={message.id}>
                                                 <div className="message-data text-end">
-                                                    <span className="message-data-time">{getDateTime(message.createdAt)}</span>
+                                                    <span className="message-data-time">
+                                                        <small>{getDateTime(message.createdAt)}</small>
+                                                    </span>
                                                 </div>
                                                 <div className="d-flex justify-content-end">
-                                                        <MessageDropdown message={message} setTextMessage={setTextMessage} setReplyMessage={setReplyMessage}/>
+                                                        <MessageDropdown message={message} setTextContent={setTextContent} setReplyMessage={setReplyMessage}/>
                                                         <div className="message my-message">
                                                         {parentMessage&&
                                                                 <div className="replyMessage">Response to <b>{user.nickName}</b>: {parentMessage.content}</div>}
@@ -138,20 +164,19 @@ const FriendChat=({friend, indexChatFriend})=>{
                             })}                           
                         </ul>
                     </div>
-                    <div className="chat-message clearfix border-top">
-                        <div className="row justify-content-begin" style={{marginBottom:"5px"}}>
+                    <div className="chat-control clearfix">
+                        <div className="row justify-content-begin mb-1">
                             <div className="col-lg-auto">
                                 <input type="file" id="fileUpload" onChange={(e)=>handleUpload(e)}  style={{display: 'none'}}/>
-                                <button className="btn btn-outline-secondary" onClick={()=>document.getElementById("fileUpload").click()}><i className="fa fa-paperclip"></i></button>
+                                <button className="btn btn-sm btn-outline-secondary" onClick={()=>document.getElementById("fileUpload").click()}><i className="fa fa-paperclip"></i></button>
                             </div> 
                             <div className="col-lg-auto">
-                                   <button ref={target} className="btn btn-outline-warning" onClick={(e)=>setShowEmojiPicker(prev=>!prev)}><i className="fa fa-smile-o"></i></button>
-                                    {showEmojiPicker&&<EmojiPicker onEmojiClick={(emojiData, e)=>handleEmojiPicker(emojiData, e)}/>}
+                                   <EmojiPickerPopover handleEmojiPicker={handleEmojiPicker}/>
                             </div>
                         </div>
                         {replyMessage&&<ReplyAlert replyMessage={replyMessage} setReplyMessage={setReplyMessage}/>}
                         <form className="input-group mb-0" onSubmit={(e)=>submitMessage(e)}>
-                            <input type="text" className="form-control" placeholder="Enter text here..." onChange={(e)=>setTextMessage(e.target.value)} value={textMessage}/>  
+                            <input type="text" className="form-control" placeholder="Enter text here..." onChange={(e)=>setTextContent(e.target.value)} value={textContent}/>  
                             <button className="input-group-text"><i className="fa fa-send"></i></button>                                  
                         </form>
                     </div>

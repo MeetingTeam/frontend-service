@@ -1,82 +1,104 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ReactionDetails, ReactionList } from "../../../Components/Message/Reaction.js";
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import MessageType from "../../../Components/Message/MessageType.js";
 import MessageDropdown from "../../../Components/Message/MessageDropdown.js";
-import EmojiPicker from "emoji-picker-react";
 import ReplyAlert from "../../../Components/Message/ReplyAlert.js";
-import { getDateTime } from "../../../Util/DateTimeUtil.js";
-import { sendPublicMessage } from "../../../Util/WebSocketService.js";
-import { getTextChannelMessages, sendFileMessage } from "../../../old-API/ChatAPI.js";
-import { loadMoreMessages, updateTeamChatMessages} from "../../../Redux/teamsReducer.js";
+import { loadMoreMessages } from "../../../Redux/teamsReducer.js";
 import Avatar from "../../../Components/Avatar/Avartar.js";
 import Voting from "../../../Components/Voting/Voting.js";
 import VotingModal from "../../../Components/Voting/VotingModal.js";
 import VoteDetailModal from "../../../Components/Voting/VoteDetailsModal.js";
 import CreateVoteModal from "../../../Components/Voting/CreateVoteModal.js";
+import MessageAPI from "../../../APIs/chat-service/MessageAPI.js";
+import { messageTypes } from "../../../Utils/Constraints.js";
+import { useSnackbarUtil } from "../../../Utils/SnackbarUtil.js";
+import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
+import MediaFileAPI from "../../../APIs/chat-service/MediaFileAPI.js";
+import { getDateTime } from "../../../Utils/DateTimeUtil.js";
+import ReactionList from "../../../Components/Message/ReactionList.js";
+import ReactionDetails from "../../../Components/Message/ReactionDetails.js";
+import EmojiPickerPopover from "../../../Components/ChatControl/EmojiPickerPopover.js";
 
 const TextChannel=({team, channel, channelInfo})=>{
             const dispatch=useDispatch();
+            const { showErrorMessage } = useSnackbarUtil();
             const user=useSelector(state=>state.user);
-            const [textMessage, setTextMessage]=useState("");
+            const [textContent, setTextContent]=useState("");
             const [replyMessage, setReplyMessage]=useState(null);
-            const [showEmojiPicker, setShowEmojiPicker]=useState(false);
             const [reactions, setReactions]=useState(null);
             const [showVoting, setShowVoting]=useState({type:0, message:null});
+            
             useEffect(()=>{
-                if(!channel.messages)
-                    getTextChannelMessages(0, channel.id).then(res=>{
-                        dispatch(loadMoreMessages({channelInfo: channelInfo, messages: res.data}))
+                if(!channel.messages){
+                    MessageAPI.getTextChannelMessages(0, channel.id).then(res=>{
+                        dispatch(loadMoreMessages({
+                            channelInfo: channelInfo, 
+                            messages: res.data}))
                     })
+                }
             },[channel])
+            
             function submitMessage(e){
                 e.preventDefault();
-                const chatMessage={
-                    senderId: user.id,
+                const textMessage={
+                    teamId: team.id,
                     channelId: channel.id,
-                    content: textMessage,
-                    messageType: "TEXT",
-                    createdAt: new Date()
+                    content: textContent,
+                    type: messageTypes.TEXT
                 }
                 if(replyMessage){
-                    chatMessage.parentMessageId=replyMessage.id;
+                    textMessage.parentMessageId=replyMessage.id;
                     setReplyMessage(null);
                 }
-                sendPublicMessage(chatMessage);
-                setTextMessage("");
+                MessageAPI.sendTextMessage(textMessage).catch(err=>showErrorMessage(handleAxiosError(err)));
+                setTextContent("");
           }
           function handleAddMessagesButton(e){
                 e.preventDefault();
                 let limit=channel.messages?channel.messages.length:0;
-                getTextChannelMessages(channel.messages.length, channel.id).then(res=>{
+                MessageAPI.getTextChannelMessages(channel.messages.length, channel.id).then(res=>{
                     dispatch(loadMoreMessages({channelInfo: channelInfo, messages: res.data}))
                 })
           }
           function handleUpload(e){
-                e.preventDefault();
                 const file=e.target.files[0];
-                const message={
-                    senderId: user.id,
-                    channelId: channel.id,
-                    createdAt: new Date()
-                }
-                sendFileMessage(message, file);
-                e.target.value="";
-          }
-          function handleEmojiPicker(emojiData, e){
-            setTextMessage(prev=>prev+emojiData.emoji);
+                if(!file) {
+                    showErrorMessage("File is not choosen. Please try again");
+                        return;
+                    }
+                    if(file.size>100000000) {
+                        showErrorMessage("File too big");
+                        return;
+                    }
+                    MediaFileAPI.uploadFileToS3(file).then(presignedUrl=>{
+                                  const fileMessage={
+                                      teamId: team.id,
+                                      channelId: channel.id,
+                                      mediaFile: {
+                                          fileUrl: presignedUrl,
+                                          fileType: file.type,
+                                          fileSizeInBytes: file.size
+                                      }
+                                  }
+                                  MediaFileAPI.sendFileMessage(fileMessage)
+                                      .catch(()=> showErrorMessage("Failed to uplaod file"));
+                          })
+                          .catch(()=> showErrorMessage("Failed to upload file"));
+                          e.target.value="";
+            }
+          function handleEmojiPicker(emojiData){
+            setTextContent(prev=>prev+emojiData.emoji);
             }
           return(
           <>
                     {reactions&&<ReactionDetails reactions={reactions} people={team.members.map(member=>member.u)} setShow={setReactions}/>}
-                    {showVoting.type==1&&<VotingModal message={showVoting.message} setShow={setShowVoting}/>}
+                    {showVoting.type==1&&<VotingModal nickName={user.nickName} message={showVoting.message} setShow={setShowVoting}/>}
                     {showVoting.type==2&&<VoteDetailModal message={showVoting.message} setShow={setShowVoting} team={team}/>}
-                    {showVoting.type==3&&<CreateVoteModal setShow={setShowVoting} channel={channel}/>}
+                    {showVoting.type==3&&<CreateVoteModal teamId={team.id} nickName={user.nickName}  setShow={setShowVoting} channel={channel}/>}
                     <div className="chat-history">
                         <button className="btn btn-success" onClick={(e)=>handleAddMessagesButton(e)}>See more messages</button>
                         <ul className="m-b-0">
-                            {channel.messages&&channel.messages.map((message)=>{
+                            {team.members&&channel.messages?.map((message)=>{
                                 let parentMessage=null;
                                 if(message.parentMessageId){
                                     const index=channel.messages.findIndex(mess=>mess.id==message.parentMessageId);
@@ -86,7 +108,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                                         if(parentMessage.content.length>61) parentMessage.content=parentMessage.content.substring(0,60)+"...";
                                         }
                                     }
-                                    if(message.messageType=="VOTING"){
+                                    if(message.type==messageTypes.VOTING){
                                         if(message.notShow) return;
                                         let creatorNickName=user.nickName;
                                         if(message.senderId!=user.id){
@@ -110,7 +132,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                                                                     <MessageType message={message}/>
                                                                     <ReactionList reactions={message.reactions} setReactions={setReactions}/>
                                                             </div>
-                                                                 <MessageDropdown message={message} setTextMessage={setTextMessage} setReplyMessage={setReplyMessage}/>
+                                                                 <MessageDropdown message={message} setTextContent={setTextContent} setReplyMessage={setReplyMessage}/>
                                                         </div>
                                                     </li>  
                                                 )
@@ -121,7 +143,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                                                     <span className="message-data-time"><small>{getDateTime(message.createdAt)}</small></span>
                                                 </div>
                                                 <div className="d-flex justify-content-end">
-                                                        <MessageDropdown message={message} setTextMessage={setTextMessage} setReplyMessage={setReplyMessage}/>
+                                                        <MessageDropdown message={message} setTextContent={setTextContent} setReplyMessage={setReplyMessage}/>
                                                         <div className="message my-message">
                                                             {parentMessage&&
                                                                     <div className="replyMessage">Response to <b>{parentMessage.sender.nickName}</b>: {parentMessage.content}</div>}
@@ -134,23 +156,22 @@ const TextChannel=({team, channel, channelInfo})=>{
                                     })}                           
                                 </ul>
                             </div>
-                            <div className="chat-message clearfix border-top">
+                            <div className="chat-control clearfix">
                                 <div className="row justify-content-begin" style={{marginBottom:"5px"}}>
                                     <div className="col-lg-auto">
                                         <input type="file" id="fileUpload" onChange={(e)=>handleUpload(e)}  style={{display: 'none'}}/>
-                                        <button className="btn btn-outline-secondary" onClick={()=>document.getElementById("fileUpload").click()}><i className="fa fa-paperclip"></i></button>
+                                        <button className="btn btn-sm btn-outline-secondary" onClick={()=>document.getElementById("fileUpload").click()}><i className="fa fa-paperclip"></i></button>
                                     </div> 
                                     <div className="col-lg-auto">
-                                           <button className="btn btn-outline-warning" onClick={(e)=>setShowEmojiPicker(prev=>!prev)}><i className="fa fa-smile-o"></i></button>
-                                            {showEmojiPicker&&<EmojiPicker onEmojiClick={(emojiData, e)=>handleEmojiPicker(emojiData, e)}/>}
+                                        <EmojiPickerPopover handleEmojiPicker={handleEmojiPicker}/>
                                     </div>
                                     <div className="col-lg-auto">
-                                           <button className="btn btn-outline-info" onClick={(e)=>setShowVoting({type:3, message:null})}><i className="fa fa-check-square"></i></button>
+                                           <button className="btn btn-sm btn-outline-info" onClick={(e)=>setShowVoting({type:3, message:null})}><i className="fa fa-check-square"></i></button>
                                     </div>
                                 </div>
                                 {replyMessage&&<ReplyAlert replyMessage={replyMessage} setReplyMessage={setReplyMessage}/>}
                                 <form className="input-group mb-0" onSubmit={(e)=>submitMessage(e)}>
-                                    <input type="text" className="form-control" placeholder="Enter text here..." onChange={(e)=>setTextMessage(e.target.value)} value={textMessage}/>  
+                                    <input type="text" className="form-control" placeholder="Enter text here..." onChange={(e)=>setTextContent(e.target.value)} value={textContent}/>  
                                     <button className="input-group-text"><i className="fa fa-send"></i></button>                                  
                                 </form>
                     </div>

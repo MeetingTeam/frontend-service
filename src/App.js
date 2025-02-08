@@ -8,6 +8,7 @@ import AccountActivation from './Pages/Login/AccountActivation.js';
 import { amplifyConfig } from './Configs/AmplifyConfig.js';
 import { Amplify } from 'aws-amplify';
 import ProtectedRouter from './Routers/ProtectedRouter.js';
+import ClientRouter from './Routers/ClientRouter.js';
 
 function App() {
   Amplify.configure(amplifyConfig);
@@ -20,7 +21,7 @@ function App() {
                       <Route path="/changePassword" element={<ChangePassword/>}/>
                       <Route path="/accountActivation" element={<AccountActivation/>}/>
                       {/* <Route path="videoCall" element={<ZegoMeeting/>}/> */}
-                      <Route path="/*" element={<ProtectedRouter><div>Hello</div></ProtectedRouter>}/>
+                      <Route path="/*" element={<ProtectedRouter><ClientRouter/></ProtectedRouter>}/>
                   </Routes>
             </SnackbarProvider>
         </BrowserRouter>

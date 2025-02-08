@@ -1,16 +1,12 @@
 import { Button, Modal } from "react-bootstrap";
-import { unfriend } from "../../../old-API/UserAPI.js";
-import { useSnackbar } from "notistack";
+import FriendAPI from "../../../APIs/user-service/FriendAPI.js";
+import { alertError } from "../../../Utils/ToastUtil.js";
 
 const UnfriendModal=({friend, setShow})=>{
-          const { enqueueSnackbar } = useSnackbar();
-          function showSnackbar(content, isSuccess){
-                    const config = {variant:(isSuccess?"success":"error"),anchorOrigin:{ horizontal: 'center' , vertical: 'bottom'}}
-                    enqueueSnackbar(content, config);
-          }
+
           function handleYesBtn(){
-                    unfriend(friend.id).then(res=>{
-                              showSnackbar("Unfriend successfully",true);
+                    FriendAPI.unfriend(friend.id).then(res=>{
+                              alertError("Unfriend successfully");
                               setShow(false);
                     }).catch(err=>showSnackbar(err.response.data,true));
           }

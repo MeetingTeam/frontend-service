@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { createTeam } from "../../../old-API/TeamAPI.js";
 import { useDispatch } from "react-redux";
 import { updateTeam } from "../../../Redux/teamsReducer.js";
+import TeamAPI from "../../../APIs/team-service/TeamAPI.js";
+import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
 
-const CreateTeamModal=({setShow})=>{
+const CreateTeamModal=({setShow, showErrorMessage})=>{
           const dispatch=useDispatch();
           const [teamName, setTeamName]=useState("");
           function handleSubmit(){
-                    createTeam({teamName: teamName}).then(res=>{
+                TeamAPI.createTeam({teamName: teamName}).then(res=>{
                               dispatch(updateTeam(res.data));
                               setShow(false);
-                    })
+                })
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           return(
                     <Modal show={true} onHide={()=>setShow(false)}>

@@ -1,15 +1,22 @@
 import { Button, Form, Modal } from "react-bootstrap";
-import { chooseOption } from "../../old-API/VoteAPI.js";
 import { useState } from "react";
+import VotingAPI from "../../APIs/chat-service/VotingAPI.js";
+import { alertError } from "../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
-const VotingModal=({message,setShow})=>{
+const VotingModal=({message,nickName, setShow})=>{
           const [optionNames, setOptionNames]=useState([]);
           function handleSubmit(){
-                    if(optionNames.length==0) return;                              
-                    chooseOption(message.id, optionNames).then(res=>{
+                    if(optionNames.length==0) return; 
+                    const chooseOptionDto={
+                        messageId: message.id, 
+                        optionNames,
+                        nickName
+                    }                             
+                    VotingAPI.chooseOption(chooseOptionDto).then(res=>{
                               setShow({type:0, message: null});
                     })
-                    .catch(err=>alert(err));
+                    .catch(err=>alertError(handleAxiosError(err)));
           }
           function clickOption(optionName){
                     if(message.voting.isSingleAnswer) setOptionNames([optionName]);

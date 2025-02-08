@@ -1,107 +1,114 @@
  .card {
-          background: #fff;
-          transition: .5s;
-          border: 0;
-          margin-bottom: 30px;
-          border-radius: .55rem;
-          position: relative;
-          width: 100%;
-          box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
-      }
-      .chat-app .teams-list {
-          width: 280px;
-          position: absolute;
-          left: 0;
-          top: 0;
-          padding: 20px;
-          z-index: 7
-      }
+        background: #fff;
+        transition: .5s;
+        border: 0;
+        border-radius: .55rem;
+        margin-bottom: 0 !important;
+        position: relative;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+}
+
+.chat-app .teams-management {
+        width: 280px;
+        position: absolute;
+        z-index: 7
+}
+
+.teams-management .teams-list {
+    padding: 10px;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.teams-management .teams-control {
+    padding: 10px;
+}
       
-      .chat-app .chat {
-          margin-left: 280px;
-          border-left: 1px solid #eaeaea
-      }
+.chat-app .chat {
+    margin-left: 280px;
+    border-left: 1px solid #eaeaea
+}
       
-      .teams-list {
-          -moz-transition: .5s;
-          -o-transition: .5s;
-          -webkit-transition: .5s;
-          transition: .5s
-      }
+.teams-management {
+    -moz-transition: .5s;
+    -o-transition: .5s;
+    -webkit-transition: .5s;
+    transition: .5s
+}
       
-      .teams-list .chat-list li {
-          padding: 10px 15px;
-          list-style: none;
-          border-radius: 3px
-      }
+.teams-management .chat-list li {
+    padding: 10px 15px;
+    list-style: none;
+    border-radius: 3px
+}
       
-      .teams-list .chat-list li:hover {
-          background: #efefef;
-          cursor: pointer
-      }
+.teams-management .chat-list li:hover {
+    background: #efefef;
+    cursor: pointer
+}
       
-      .teams-list .chat-list li.active {
-          background: #efefef
-      }
+.teams-management .chat-list li.active {
+    background: #efefef
+}
       
-      .teams-list .chat-list li .name {
-          font-size: 15px
-      }
+.teams-management .chat-list li .name {
+    font-size: 15px
+}
       
-      .teams-list .chat-list img {
-          width: 45px;
-          border-radius: 50%
-      }
+.teams-management .chat-list img {
+    width: 45px;
+    border-radius: 50%
+}
       
-      .teams-list img {
-          float: left;
-          border-radius: 50%
-      }
+.teams-management img {
+    float: left;
+    border-radius: 50%
+}
       
-      .teams-list .about {
-          float: left;
-          padding-left: 8px
-      }
+.teams-management .about {
+    float: left;
+    padding-left: 8px
+}
       
-      .teams-list .status {
-          color: #999;
-          font-size: 13px
-      }
+.teams-management .status {
+    color: #999;
+    font-size: 13px
+}
       
-      .chat .chat-header {
-          padding: 10px 15px;
-          border-bottom: 2px solid #f4f7f6
-      }
+.chat .chat-header {
+    padding: 5px 15px;
+    border-bottom: 2px solid #f4f7f6
+}
       
-      .chat .chat-header img {
-          float: left;
-          border-radius: 40px;
-          width: 40px
-      }
+.chat .chat-header img {
+    float: left;
+    border-radius: 40px;
+    width: 40px
+}
       
-      .chat .chat-header .chat-about {
-          float: left;
-          padding-left: 10px
-      }
+.chat .chat-header .chat-about {
+    float: left;
+    padding-left: 10px
+}
       
-      .chat .chat-history {
-          padding: 20px;
-          border-bottom: 2px solid #fff;
-          background-color:  #f8f9fa;
-      }
+.chat .chat-history {
+    padding: 5px 20px;
+    border-bottom: 2px solid #fff;
+    background-color:  #f8f9fa;
+}
       
-      .chat .chat-history ul {
-          padding: 0
-      }
+.chat .chat-history ul {
+    padding: 0
+}
       
-      .chat .chat-history ul li {
-          list-style: none;
-          margin-bottom: 30px
-      }
+.chat .chat-history ul li {
+    list-style: none;
+    margin-bottom: 15px
+}
       
-      .chat .chat-history ul li:last-child {
-          margin-bottom: 0px
-      }
+.chat .chat-history ul li:last-child {
+    margin-bottom: 0px
+}
       
       .chat .chat-history .message-data {
           margin-bottom: 15px
@@ -169,59 +176,63 @@
           left: 93%
       }
       .chat-history{
-          height: 500px;
+          height: 460px;
           overflow-y: scroll;
       }
-      .chat .chat-message {
-          padding: 10px
+      .chat .chat-control {
+          padding: 5px
       }
       
-      .online,
-      .offline,
-      .me {
-          margin-right: 2px;
-          font-size: 8px;
-          vertical-align: middle
-      }
+.online,
+.offline,
+.me {
+        margin-right: 2px;
+        font-size: 8px;
+        vertical-align: middle
+}
       
-      .online {
-          color: #86c541
-      }
+.online {
+    color: #86c541
+}
+
+.offline {
+    color: #e47297
+}
       
-      .offline {
-          color: #e47297
-      }
+.me {
+    color: #1d8ecd
+}
       
-      .me {
-          color: #1d8ecd
-      }
+.float-right {
+    float: right
+}
       
-      .float-right {
-          float: right
-      }
-      
-      .clearfix:after {
+.clearfix:after {
           visibility: hidden;
           display: block;
           font-size: 0;
           content: " ";
           clear: both;
           height: 0
-      }
-      .replyMessage{
-          font-style: italic !important;
-          color: gray !important;
-      }
-    .accordion-button{
+}
+
+.replyMessage{
+    font-style: italic !important;
+    color: gray !important;
+}
+    
+.accordion-button{
         padding: 5px 5px; 
         font-size: 14px;
-    }
-    .channelType{
+}
+    
+.channelType{
         padding: 5px !important;
-    }
-    .accordion-button:not(.collapsed) {
+}
+    
+.accordion-button:not(.collapsed) {
         background-color: #b5b1b1;
         color: #000;
         box-shadow: none;
-    }
+}
     

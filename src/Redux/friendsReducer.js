@@ -1,7 +1,8 @@
 import {createSlice } from "@reduxjs/toolkit";
+
 const friendsReducer=createSlice({
           name:"friends",
-          initialState:[],
+          initialState:null,
           reducers:{
                     loadFriends:(state,action)=>{
                               return action.payload;
@@ -45,7 +46,6 @@ const friendsReducer=createSlice({
                     },
                     updateFriends:(state, action)=>{
                               const updatedFriend=action.payload;
-                              console.log("Redux", updatedFriend);
                               var friendIndex=state.findIndex(f=>f.id==updatedFriend.id);
                               if(friendIndex>=0) state[friendIndex]=updatedFriend;
                               else state.push(updatedFriend);

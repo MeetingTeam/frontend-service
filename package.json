@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/auth": "^5.3.3",
+    "@aws-sdk/client-s3": "^3.741.0",
     "@reduxjs/toolkit": "^2.0.1",
     "@stomp/stompjs": "^7.0.0",
     "@testing-library/react": "^13.4.0",
@@ -24,6 +25,7 @@
     "react-dotenv": "^0.1.3",
     "react-redux": "^9.0.4",
     "react-scripts": "5.0.1",
+    "react-toastify": "^11.0.3",
     "redux": "^5.0.1",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",

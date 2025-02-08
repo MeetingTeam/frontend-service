@@ -1,5 +1,5 @@
-import { MEETING_SERVICE_ENDPOINT } from "../../Util/EnvStore.js";
-import AxiosService from "./AxiosService";
+import AxiosService from "../../Services/AxiosService.js";
+import { MEETING_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const calendarEndpoint = MEETING_SERVICE_ENDPOINT+"/calendar";
 

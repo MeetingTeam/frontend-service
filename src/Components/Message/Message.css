@@ -2,6 +2,7 @@
           font-style: italic !important;
           color: grey !important;
 }
+
 .reaction {
           position: relative;
           bottom: -20px;
@@ -16,11 +17,19 @@
           justify-content: center;
           box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
+
+.reaction-list {
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%; 
+  }
+
 .customImage{
     width:100% !important;
     height: 100% !important;
-    width: "400px" !important;
-    height: "400px" !important;
+    max-width: "400px" !important;
+    max-height: "400px" !important;
     object-fit: contain !important;
 }
       

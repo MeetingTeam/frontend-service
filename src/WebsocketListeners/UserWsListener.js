@@ -1,38 +1,39 @@
 import { addFriendChatMessage, deleteFriend, updateFriends } from "../Redux/friendsReducer.js";
 import { deleteTeam, updateTeam } from "../Redux/teamsReducer.js";
-import { AddOrUpdateFriend, AddOrUpdateMeeting, AddOrUpdateMessage, DeleteFriend, DeleteTeam } from "../Util/Constraints.js";
-import WebSocketService from "../Util/WebSocketService.js";
+import WebSocketService from "../Services/WebSocketService.js";
+import { wsTopics } from "../Utils/Constraints.js";
 
 export function subscribeToUserTopics(user, dispatch){
-          const dest= "user."+user.id;
+          const dest= "/topic/user."+user.id;
 
-          WebSocketService.subscribeToNewTopic(dest, AddOrUpdateMessage ,
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateMessage ,
                     (payload)=>{
                               const message=payload;
                               dispatch(addFriendChatMessage(message))
-          })
+          });
                     
-          WebSocketService.subscribeToNewTopic(dest, AddOrUpdateMeeting,
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateMeeting,
                     (payload)=>{
                         const newTeam=payload;
                         dispatch(updateTeam(newTeam));
-          })
+          });
           
-          WebSocketService.subscribeToNewTopic(dest, DeleteTeam,
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteTeam,
                     (payload)=>{
                         const teamId=payload;
                         unsubscribeByTeamId(teamId);
                         dispatch(deleteTeam(teamId));
-          })
+          });
                     
-          WebSocketService.subscribeToNewTopic(dest,AddOrUpdateFriend,(payload)=>{
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateFriend,
+                (payload)=>{
                         const updatedFriend=payload;
                         dispatch(updateFriends(updatedFriend));
-          })
+          });
                     
-          WebSocketService.subscribeToNewTopic(dest,DeleteFriend,
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteFriend,
                     (payload)=>{
                         const friendId=payload;
                         dispatch(deleteFriend(friendId));
-          })
+          });
 }

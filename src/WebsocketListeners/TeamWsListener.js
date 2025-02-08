@@ -1,37 +1,49 @@
-import { addTeamChatMessage } from "../Redux/teamsReducer.js";
-import { AddOrUpdateMessage } from "../Util/Constraints.js";
-import WebSocketService from "../Util/WebSocketService.js";
+import { addTeamChatMessage, deleteMeeting, updateChannels, updateTeam } from "../Redux/teamsReducer.js";
+import WebSocketService from "../Services/WebSocketService.js";
+import { wsTopics } from "../Utils/Constraints.js";
 
 export function subscribeToTeamTopics(team, dispatch){
-          const dest="team."+team.id
-          WebSocketService.subscribeToNewTopic(dest, AddOrUpdateMessage,
+          const dest="/topic/team."+team.id
+          
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateMessage,
                     (payload)=>{
                               const message=payload;
-                              dispatch(addTeamChatMessage({teamId: team.id, message}));
+                              dispatch(addTeamChatMessage(message));
                     });      
                       
-          subscribeToNewTopic(url,"/updateMembers", (payload)=>{
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addTeamMembers, 
+              (payload)=>{
                         const members=payload;
                         dispatch(updateMembers({teamId: team.id, newMembers: members}))
-                      })
-                      subscribeToNewTopic(url,"/updateChannels",(payload)=>{
+                    });
+          
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateChannel,
+                    (payload)=>{
                           const channel=payload;
                           dispatch(updateChannels({teamId: team.id, newChannel: channel}))
-                      })
-                      subscribeToNewTopic(url, "/removeChannel",(payload)=>{
+                    });
+          
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteChannel,
+                (payload)=>{
                         const channelId=payload;
                         dispatch(removeChannel({teamId: team.id, channelId}))
-                      })
-                      subscribeToNewTopic(url, "/updateTeam",(payload)=>{
+                    });
+          
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateTeam,
+                (payload)=>{
                         const updatedTeam=JSON.parse(payload.body);
                         dispatch(updateTeam(updatedTeam));
-                      })
-                      subscribeToNewTopic(url, "/updateMeetings", (payload)=>{
+                      });
+                      
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateMeeting, 
+                (payload)=>{
                         const meeting=payload;
-                        dispatch(updateMeetings({teamId: team.id, meeting: meeting}))
-                      })
-                      subscribeToNewTopic(url, "/deleteMeeting",(payload)=>{
+                        dispatch(updateMeetings(meeting))
+                      });
+                      
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteMeeting,
+                (payload)=>{
                         const data=payload;
-                        dispatch(deleteMeeting({teamId: team.id, ...data}))
-                      })
+                        dispatch(deleteMeeting({...data}))
+                  });
 }

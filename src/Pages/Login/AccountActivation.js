@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Auth } from "aws-amplify";
-import { useSnackbarUtil } from "../../Util/SnackbarUtil.js";
-import ErrorUtil from "../../Util/ErrorUtil.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
 
 const AccountActivation=()=>{
           const location = useLocation();
@@ -25,14 +25,14 @@ const AccountActivation=()=>{
                       setError("Email is required");
                   }
                   Auth.resendSignUp(data.email)
-                    .catch(err=> showErrorMessage(ErrorUtil.handleAmplifyError(err)));
+                    .catch(err=> showErrorMessage(handleAmplifyError(err)));
           }
           function onSubmit(){
                     Auth.confirmSignUp(data.email, data.OTPcode).then(res=>{
                       showSuccessMessage("Activate account successfully");
                       navigate("/login");
                     })
-                    .catch(err=> showErrorMessage(ErrorUtil.handleAmplifyError(err)));
+                    .catch(err=> showErrorMessage(handleAmplifyError(err)));
           }
           return(
                     <div className="container">

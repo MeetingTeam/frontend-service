@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
-import { ACCESS_TOKEN, API_ENDPOINT, REFRESH_TOKEN } from "../../Util/Constraints.js";
 import {Auth} from "@aws-amplify/auth";
-import { useSnackbarUtil } from "../../Util/SnackbarUtil.js";
-import ErrorUtil from "../../Util/ErrorUtil.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
 
 const LoginPage=()=>{
           const navigate = useNavigate();
@@ -23,7 +22,7 @@ const LoginPage=()=>{
                         navigate("/friendsPage");
                       })
                       .catch(err=>{
-                          showErrorMessage(ErrorUtil.handleAmplifyError(err));
+                          showErrorMessage(handleAmplifyError(err));
                       })
                 }
           }

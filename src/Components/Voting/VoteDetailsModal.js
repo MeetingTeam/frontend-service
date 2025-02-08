@@ -1,6 +1,7 @@
-import { Accordion, Button, Col, Modal, Row } from "react-bootstrap";
-import { getDateTime } from "../../Util/DateTimeUtil.js";
+import { Accordion, Col, Modal, Row } from "react-bootstrap";
 import Avatar from "../Avatar/Avartar.js";
+import { getDateTime } from "../../Utils/DateTimeUtil.js";
+
 const VoteDetailModal=({message,team,setShow})=>{
           const members=team.members;
           return(

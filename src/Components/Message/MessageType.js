@@ -1,39 +1,47 @@
 import "./Message.css"
-import VideoIcon from "../../Resource/VideoIcon.png"
-import AudioIcon from "../../Resource/AudioIcon.png"
-import FileIcon from "../../Resource/FileIcon.jpg"
+import VideoIcon from "../../Resources/VideoIcon.png"
+import AudioIcon from "../../Resources/AudioIcon.png"
+import FileIcon from "../../Resources/FileIcon.jpg"
+import { messageTypes } from "../../Utils/Constraints.js"
+
 const MessageType=({message})=>{
-    if(message.messageType=="TEXT")
+    if(message.type==messageTypes.TEXT)
         return message.content;
-    else if(message.messageType=="UNSEND"){
+    else if(message.type==messageTypes.UNSEND){
               return (<div className="unsendMessage">Message has been deleted</div>);
     }
-    else if(message.messageType=="IMAGE"){
-              return (<img className="customImage" src={message.content} alt={message.fileName}/>)
-    }
-    else if(message.messageType=="VIDEO"){
-              return (
-                <div>
-                        <img src={VideoIcon} alt="VideoIcon" width="40px" height="40px"/>
-                        <a href={message.content}>{message.fileName}</a>
-                </div>
-            )
-    }
-    else if(message.messageType=="AUDIO"){
+    else{
+        const mediaFile=message.mediaFile;
+        if(message.type==messageTypes.IMAGE){
+            return (<img className="customImage" src={mediaFile.fileUrl} alt={mediaFile.fileName}/>)
+        }
+        else if(message.type==messageTypes.VIDEO){
+                    return (
+                    <div>
+                            <img src={VideoIcon} type={mediaFile.fileType} alt="VideoIcon" width="40px" height="40px"/>
+                            <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
+                            <small>{mediaFile.fileSizeInBytes} bytes</small>
+                    </div>
+                )
+        }
+        else if(message.type==messageTypes.AUDIO){
+                return (
+                    <div>
+                            <img src={AudioIcon} type={mediaFile.fileType} alt="AudioIcon" width="40px" height="40px"/>
+                            <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
+                            <small>{mediaFile.fileSizeInBytes} bytes</small>
+                    </div>
+                )
+        }
+        else if(message.type==messageTypes.DOCUMENT){
             return (
                 <div>
-                        <img src={AudioIcon} alt="AudioIcon" width="40px" height="40px"/>
-                        <a href={message.content}>{message.fileName}</a>
+                        <img src={FileIcon} alt="FileIcon" width="40px" height="40px"/>
+                        <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
+                        <small>{mediaFile.fileSizeInBytes} bytes</small>
                 </div>
             )
-    }
-    else if(message.messageType=="FILE"){
-        return (
-            <div>
-                    <img src={FileIcon} alt="FileIcon" width="40px" height="40px"/>
-                    <a href={message.content}>{message.fileName}</a>
-            </div>
-        )
-    }
+        }
+    } 
 }
 export default MessageType;

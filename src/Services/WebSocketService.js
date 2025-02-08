@@ -1,7 +1,7 @@
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import { WEBSOCKET_SERVICE_ENDPOINT } from "./EnvStore.js";
-import { Auth } from "aws-amplify";
+import { getAccessToken } from "../Utils/TokenUtil.js";
+import { WEBSOCKET_SERVICE_ENDPOINT } from "../Utils/EnvStore.js";
 
 class WebsocketService {
   constructor() {
@@ -17,12 +17,13 @@ class WebsocketService {
       this.sock = new SockJS(this.websocketEndpoint);
       this.stompClient = Stomp.over(this.sock);
       
-      const session= await Auth.currentSession();
-      const jwtToken= session.getAccessToken().getJwtToken();
+      const jwtToken= await getAccessToken()
 
-      this.stompClient.connect({ WS_AUTH_HEADER: jwtToken }, 
+      this.stompClient.connect(
+        { "Authorization": jwtToken }, 
         this.onConnected.bind(this), 
-        this.onError.bind(this));
+        this.onError.bind(this)
+      );
     }
   }
 

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useSnackbarUtil } from "../../Util/SnackbarUtil.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { Auth } from "aws-amplify";
-import ErrorUtil from "../../Util/ErrorUtil.js";
+import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
 
 const ChangePassword=()=>{
           const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ChangePassword=()=>{
               Auth.forgotPassword(changePasswordDTO.email)
                 .then(()=>showSuccessMessage("Send OTP code successfully"))
                 .catch(err=>setError({
-                    txtOTP: ErrorUtil.handleAmplifyError(err)
+                    txtOTP: handleAmplifyError(err)
                 }));
           }
           function validateChangePasswordDTO(changePasswordDTO){
@@ -55,7 +55,7 @@ const ChangePassword=()=>{
                   navigate("/login");
                 })
                 .catch(err=>setError(
-                  { txtOTP: ErrorUtil.handleAmplifyError(err) }
+                  { txtOTP: handleAmplifyError(err) }
                 ));
             }
           }

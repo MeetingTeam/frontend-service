@@ -1,4 +1,6 @@
 export function handleAxiosError(axiosError){
+          if(!axiosError.response||!axiosError.response.data)
+                    return "Unknown error";
           const errorDto= axiosError.response.data;
           let errorMessage="";
           if(errorDto.fieldErrors) {
@@ -11,5 +13,6 @@ export function handleAxiosError(axiosError){
 }
 
 export function handleAmplifyError(amplifyError){
+          if(!amplifyError.message) return "Unknown error";
           return amplifyError.message;
 }

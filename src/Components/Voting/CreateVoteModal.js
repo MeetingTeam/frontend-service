@@ -1,61 +1,62 @@
-import { Button, FloatingLabel, Form, InputGroup, Modal, Row } from "react-bootstrap";
-import DateTimePicker from "react-datetime-picker";
-import { createVoting } from "../../old-API/VoteAPI.js";
+import { Button, Form, InputGroup, Modal} from "react-bootstrap";
 import { useRef, useState } from "react";
+import VotingAPI from "../../APIs/chat-service/VotingAPI.js";
 
-const CreateVoteModal=({channel,setShow})=>{
-          const [message, setMessage]=useState({
-                content:"",
-                createdAt: null,
-                voting:{
-                    isSingleAnswer: false,
-                    endTime: null,
-                    options: [{name:""},{name:""}],
-                    events:[]
-                }
+const CreateVoteModal=({nickName, teamId, channel,setShow})=>{
+          const [voting, setVoting]=useState({
+                title: "",
+                isSingleAnswer: false,
+                endTime: null,
+                options: [{name:""},{name:""}],
+                events:[]
             });
             const endDateRef = useRef();
             const endTimeRef = useRef();
             const [error, setError]=useState(null);
 
           function deleteOptionTb(index){
-                const updatedData = { ...message };
-                updatedData.voting.options=updatedData.voting.options.filter((_,i)=>i!=index);
-                setMessage(updatedData);
+                const updatedData = { ...voting };
+                updatedData.options=updatedData.options.filter((_,i)=>i!=index);
+                setVoting(updatedData);
           }
           function addOptionTb(){
-            const updatedData = { ...message };
-            updatedData.voting.options.push({name:""});
-            setMessage(updatedData);
+            const updatedData = { ...voting };
+            updatedData.options.push({name:""});
+            setVoting(updatedData);
           }
           function handleOnChange(fieldName,e,index){
-                const updatedData={...message};
-                if(fieldName=="question")
-                    updatedData.content=e.target.value;
+                const updatedData={...voting};
+                if(fieldName=="title")
+                    updatedData.title=e.target.value;
                 else if(fieldName=="options")
-                    updatedData.voting.options[index].name=e.target.value;
+                    updatedData.options[index].name=e.target.value;
                 else if(fieldName=="endTime")
-                    updatedData.voting.endTime=endDateRef.current.value+"T"+endTimeRef.current.value;
+                    updatedData.endTime=endDateRef.current.value+"T"+endTimeRef.current.value;
                 else if(fieldName=="isSingleAnswer")
-                    updatedData.voting.isSingleAnswer=e.target.checked;
-                setMessage(updatedData);
+                    updatedData.isSingleAnswer=e.target.checked;
+                setVoting(updatedData);
           }
           function handleSubmit(){
-                if(message.voting.options.length<2){
+                if(message.options.length<2){
                     setError("Please add at least two options");
                     return;
                 }
-                else if(message.content.trim().length==0){
-                    setError("Please fill in the question of the vote");
+                else if(voting.title.trim().length==0){
+                    setError("Please fill in the title of the vote");
                     return;
-                }                
-                message.channelId=channel.id;
-                message.createdAt=new Date();
-                createVoting(message).then(res=>{
+                }      
+                const message={
+                    channelId: channel.id,
+                    teamId: teamId,
+                    username: nickName,
+                    voting
+                }  
+                VotingAPI.createVoting(message).then(res=>{
                     setShow({type:0, message:null});
                 })
                 .catch(err=>setError(err.response.data));
           }
+
           return(
           <Modal show={true} onHide={()=>setShow({type:0, message:null})}>
                     <Modal.Header closeButton>
@@ -63,11 +64,11 @@ const CreateVoteModal=({channel,setShow})=>{
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
-                              <Form.Group className="mb-3" controlId="question">
-                                        <Form.Label>Vote Question</Form.Label>
-                                        <Form.Control as="textarea" onChange={(e)=>handleOnChange("question",e)} rows={3} placeholder="Add your question here"/>
+                              <Form.Group className="mb-3" controlId="title">
+                                        <Form.Label>Vote Title</Form.Label>
+                                        <Form.Control as="textarea" onChange={(e)=>handleOnChange("title",e)} rows={3} placeholder="Add your title here"/>
                               </Form.Group>
-                              <Form.Group className="mb-3" controlId="question">
+                              <Form.Group className="mb-3" controlId="title">
                                         <Form.Label>Options</Form.Label>
                                         {message.voting.options.map((option, index) =>{
                                             return(

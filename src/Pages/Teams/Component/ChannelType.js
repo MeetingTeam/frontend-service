@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import DetailsAccordion from "./DetailsAccordion.js";
+import { channelTypes } from "../../../Utils/Constraints.js";
 
 const ChannelTypeItem=({team, type, setChannelInfo, channelInfo})=>{
           const teams=useSelector(state=>state.teams);
@@ -9,6 +10,7 @@ const ChannelTypeItem=({team, type, setChannelInfo, channelInfo})=>{
                               channelIndex: channelIndex
                     });
           }
+          console.log("team", team);
           return(
                     <div className="accordion-item">
                               <h2 className="accordion-header">
@@ -36,8 +38,8 @@ export const ChannelType=(props)=>{
           const {team}=props;
           return(
                     <div className="accordion accordion-flush" id={"channelType-"+team.id}>
-                              <ChannelTypeItem {...props} type="TEXT_CHANNEL"/>
-                              <ChannelTypeItem {...props} type="VOICE_CHANNEL"/>
+                              <ChannelTypeItem {...props} type={channelTypes.CHAT_CHANNEL}/>
+                              <ChannelTypeItem {...props} type={channelTypes.VOICE_CHANNEL}/>
                               <DetailsAccordion {...props} />
                     </div>
           )

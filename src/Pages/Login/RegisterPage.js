@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
-import { useSnackbarUtil } from "../../Util/SnackbarUtil.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import UserAPI from "../../APIs/user-service/UserAPI.js";
-import ErrorUtil from "../../Util/ErrorUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
 const RegisterPage=()=>{
           const navigate = useNavigate();
@@ -26,7 +26,7 @@ const RegisterPage=()=>{
                           navigate("/accountActivation",{ state: { email: userDTO.email } });
                         })
                         .catch((err)=>{
-                          showErrorMessage(ErrorUtil.handleAxiosError(err));
+                          showErrorMessage(handleAxiosError(err));
                       })
                 }
           }
