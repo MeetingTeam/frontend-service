@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { messageTypes } from "../../Utils/Constraints.js";
+import { emojiCodes, messageTypes } from "../../Utils/Constraints.js";
 import MessageAPI from "../../APIs/chat-service/MessageAPI.js";
 import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
@@ -19,9 +19,7 @@ const MessageDropdown=({message, setTextContent, setReplyMessage})=>{
                   MessageAPI.unsendMessage(message.id)
                     .catch(err=>showErrorMessage(handleAxiosError(err)));
               }
-          }
-
-          const emojiCodes = ["❤️", "😀", "🙁", "🙂"];
+          } 
           function handleEmoji(e,emojiCode){
                 e.preventDefault();
                 MessageAPI.reactMessage({

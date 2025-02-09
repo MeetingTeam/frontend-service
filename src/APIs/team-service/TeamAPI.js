@@ -12,8 +12,12 @@ class TeamAPI {
         return AxiosService.patch(teamEndpoint, teamDto);
     }
 
-    getJoinedTeams() {
-        return AxiosService.get(teamEndpoint);
+    getJoinedTeams(pageNo, pageSize) {
+        pageNo= Math.floor(pageNo);
+        return AxiosService.get(teamEndpoint, {
+            pageNo, 
+            pageSize
+        });
     }
 }
 

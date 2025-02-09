@@ -13,8 +13,8 @@ class MeetingAPI {
     }
 
     reactMeeting(meetingId, emojiCode) {
-        return AxiosService.post(`${meetingEndpoint}/reaction/${meetingId}`, null, {
-            params: { emojiCode }
+        return AxiosService.post(`${meetingEndpoint}/reaction/${meetingId}`, {}, {
+            emojiCode
         });
     }
 

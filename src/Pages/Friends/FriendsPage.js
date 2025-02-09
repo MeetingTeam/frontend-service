@@ -1,19 +1,32 @@
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import "./FriendsPage.css"
 import { getTimeDistance } from "../../Utils/DateTimeUtil.js";
 import FriendChat from "./FriendChat.js";
 import { useState } from "react";
 import Avatar from "../../Components/Avatar/Avartar.js";
+import FriendAPI from "../../APIs/user-service/FriendAPI.js";
+import { loadMoreFriends } from "../../Redux/friendsReducer.js";
+import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
 const FriendsPage=()=>{
+          const dispatch= useDispatch();
+          const { showErrorMessage } = useSnackbarUtil();
           const friends=useSelector(state=>state.friends);
           const [indexChatFriend, setIndexChatFriend]=useState(0);
           const [searchTerm, setSearchTerm]=useState("");
-          const [search, setSearch]=useState("");
+          const [search, setSearch]=useState("")
+
           
           function handleFriendChat(e,friendId){
                 e.preventDefault();
                 setIndexChatFriend(friends.findIndex((friend)=>friend.id==friendId))
+          }
+          function handleShowMoreBtn(){
+            FriendAPI.getFriends(friends.length/10,10).then(res=>{
+                dispatch(loadMoreFriends(res.data.data));
+            })
+            .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           const handleFilter = (item) => {
             const re = new RegExp("^"+search,"i");
@@ -51,7 +64,7 @@ const FriendsPage=()=>{
                                                     )
                                             })}
                                         </ul>
-                                        <button className="mt-1 w-100 btn btn-outline-secondary">Show More</button>
+                                        <button className="mt-1 w-100 btn btn-outline-secondary" onClick={()=>handleShowMoreBtn()}>Show More</button>
                                     </div>
                                 </div>
                                {chatFriend&&<FriendChat friend={chatFriend} indexChatFriend={indexChatFriend}/>}

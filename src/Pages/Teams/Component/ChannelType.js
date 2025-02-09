@@ -10,7 +10,7 @@ const ChannelTypeItem=({team, type, setChannelInfo, channelInfo})=>{
                               channelIndex: channelIndex
                     });
           }
-          console.log("team", team);
+          
           return(
                     <div className="accordion-item">
                               <h2 className="accordion-header">

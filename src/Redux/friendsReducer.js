@@ -7,6 +7,14 @@ const friendsReducer=createSlice({
                     loadFriends:(state,action)=>{
                               return action.payload;
                     },
+                    loadMoreFriends: (state, action)=>{
+                              const addedFriends= action.payload;
+                              const stateFriendsSet= new Set(state.map(friend=>friend.id));
+                              addedFriends.forEach(addFriend=>{
+                                        if(!stateFriendsSet.has(addFriend.id))
+                                                  state.push(addFriend);
+                              })
+                    },
                     addFriendChatMessage:(state,action)=>{
                               const message=action.payload;
                               let friendIndex=state.findIndex(friend=>friend.id===message.recipientId||friend.id===message.senderId);
@@ -56,7 +64,7 @@ const friendsReducer=createSlice({
                     }
           }
 })
-export const {loadFriends, addFriendChatMessage, 
+export const {loadFriends, loadMoreFriends, addFriendChatMessage, 
           updateFriendStatus, loadMoreMessages,
           updateFriends,deleteFriend}=friendsReducer.actions;
 export default friendsReducer.reducer;

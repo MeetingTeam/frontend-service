@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import moment from "moment";
 
 export function getTimeDistance(input) {
@@ -30,34 +31,32 @@ export function getDateTime(input){
 }
 
 export function getScheduledTime(meeting){
-          const {scheduledTime, scheduledDaysOfWeek, endDateString}=meeting;
+          const {scheduledTime, scheduledDaysOfWeek, endDate}=meeting;
           if(!scheduledTime) return "";
           const daysOfWeek=["","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Sartuday"]
-          const time=moment(scheduledTime);
+          const time=DateTime.fromFormat(scheduledTime, "HH:mm:ss");
           if(scheduledDaysOfWeek&&scheduledDaysOfWeek.size>0){
                     let result="Occurs every ";
                     scheduledDaysOfWeek.forEach(day=>{result+=daysOfWeek[day]+","})
-                    result+=" at "+time.format("HH:mm");
-                    result+=", from "+time.format("DD-MM-YYYY");
-                    if(endDateString){
-                              const endDate=moment(endDateString);
-                              result+=" to "+endDate.format("DD-MM-YYYY");
+                    result+=" at "+time.toFormat("HH:mm");
+                    result+=", from "+time.toFormat("dd-MM-yyyy");
+                    if(endDate){
+                              const endDate=DateTime.fromISO(endDate);
+                              result+=" to "+endDate.toFormat("dd-MM-yyyy");
                     }
                     return result;
           }
-          else return "schedule meeting at "+ time.format("DD-MM-YYYY , HH:mm");
+          else return "schedule meeting at "+ time.toFormat("dd-MM-yyyy , HH:mm");
 }
 
-export function getDate(inputDateTime) {
-          if (!inputDateTime) return null;
-          let d = moment(inputDateTime);
-          return d.format('YYYY-MM-DD');
+export function getDate(luxonDateTime) {
+          if (!inputDate) return null;
+          return luxonDateTime.toISODate();
 }
 
-export function getTime(inputDateTime) {
-          if (!inputDateTime) return null;
-          let d = moment(inputDateTime);
-          return d.format('HH:mm');
+export function getHourMinuteOnly(isoTimeStr){
+          if(!isoTimeStr) return null;
+          return isoTimeStr.split(":").slice(0, 2).join(":"); 
 }
 
 export function getHour(num) {

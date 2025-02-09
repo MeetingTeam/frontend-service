@@ -30,6 +30,8 @@ export const channelTypes={
 // Tab Titles
 export const tabTitles=["Members", "Pending Requests", "Channels","Settings"]
 
+export const emojiCodes = ["❤️", "😀", "🙁", "🙂"];
+
 // Message Types
 export const messageTypes ={
           UNSEND: "UNSEND",

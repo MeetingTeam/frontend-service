@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./TeamsPage.css";
 import { useState } from "react";
 import Avatar from "../../Components/Avatar/Avartar.js";
@@ -6,8 +6,12 @@ import CreateTeamModal from "./Component/CreateTeamModal.js";
 import { ChannelType } from "./Component/ChannelType.js";
 import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import TeamChat from "./TeamChat.js";
+import TeamAPI from "../../APIs/team-service/TeamAPI.js";
+import { loadMoreTeams } from "../../Redux/teamsReducer.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
 const TeamsPage=()=>{
+            const dispatch= useDispatch();
           const teams=useSelector(state=>state.teams);
           const [channelInfo, setChannelInfo]=useState({teamIndex:0, channelIndex:0});
           const [searchTerm, setSearchTerm]=useState("");
@@ -24,6 +28,12 @@ const TeamsPage=()=>{
             setChannelInfo(prev=>{
                 return {teamIndex: prev.teamIndex,channelIndex:-1, tabIndex:0};
             })
+          }
+          function handleShowMoreBtn(){
+            TeamAPI.getJoinedTeams(teams.length/10, 10).then(res=>{
+                dispatch(loadMoreTeams(res.data.data));
+            })
+            .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           let team=null;
           let channel=null;
@@ -67,7 +77,7 @@ const TeamsPage=()=>{
                                                     )
                                             })}
                                         </div>
-                                        <button className="mt-1 w-100 btn btn-outline-success">Show More</button>
+                                        <button className="mt-1 w-100 btn btn-outline-success" onClick={()=>handleShowMoreBtn()}>Show More</button>
                                     </div>
                                 </div>
                                 {team&&<TeamChat team={team} channel={channel} channelInfo={channelInfo}/>}

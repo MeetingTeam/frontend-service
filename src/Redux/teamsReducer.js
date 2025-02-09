@@ -8,9 +8,17 @@ const teamsReducer=createSlice({
                     loadTeams:(state, action)=>{
                               return action.payload;
                     },
+                    loadMoreTeams: (state, action)=>{
+                              const addedTeams= action.payload;
+                              const stateTeamsSet= new Set(state.map(team=>team.id));
+                              addedTeams.forEach(addedTeam=>{
+                                        if(!stateTeamsSet.has(addedTeam.id))
+                                                  state.push(addedTeam);
+                              });
+                    },
                     addTeamChatMessage:(state,action)=>{
                               const message=action.payload;
-                              const teamIndex=state.findIndex((team)=>team.id==message.teamId);
+                              const teamIndex=state.findIndex(team=>team.id==message.teamId);
                               if(teamIndex>-1){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==message.channelId);
                                         if(channelIndex>-1){
@@ -46,10 +54,6 @@ const teamsReducer=createSlice({
                     },
                     loadChannelMeetings:(state, action)=>{
                               const {channelInfo, meetings}=action.payload;
-                              for(let i=0;i<meetings.length;i++){
-                                        meetings[i].scheduledDaysOfWeek=new Set(meetings[i].scheduledDaysOfWeek||[]);
-                                        meetings[i].emailsReceivedNotification=new Set(meetings[i].emailsReceivedNotification||[])
-                              }
                               let channel=state[channelInfo.teamIndex].channels[channelInfo.channelIndex];
                               if(!channel.meetings||channel.meetings.length==0)
                                         channel.meetings=meetings;
@@ -62,9 +66,8 @@ const teamsReducer=createSlice({
                               state[channelInfo.teamIndex].channels[channelInfo.channelIndex]=channel;
                               return state;
                     },
-                    updateMeetings:(state, action)=>{
+                    addMeeting:(state, action)=>{
                               let meeting=action.payload;
-                              meeting.scheduledDaysOfWeek=new Set(meeting.scheduledDaysOfWeek||[]);
                               let teamIndex=state.findIndex(team=>team.id==meeting.teamId);
                               if(teamIndex>-1){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==meeting.channelId);
@@ -100,11 +103,11 @@ const teamsReducer=createSlice({
                               const teamId=action.payload;
                               return state.filter(team=>team.id!==teamId);
                     },
-                    updateMembers:(state, action)=>{
+                    addMembers:(state, action)=>{
                               const {teamId,newMembers}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              const members=state[teamIndex].members;
-                              if(members){
+                              const members={...state[teamIndex].members};
+                              if(members&&members.length){
                                         newMembers.forEach(newMember=> {
                                                   const memberIndex=members.findIndex(member=>member.u.id==newMember.u.id);
                                                   if(memberIndex>=0) members[memberIndex]=newMember;
@@ -114,7 +117,7 @@ const teamsReducer=createSlice({
                               }
                               else state[teamIndex].members= newMembers;
                     },
-                    updateChannels:(state, action)=>{
+                    addChannel:(state, action)=>{
                               const {teamId, newChannel}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
                               let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==newChannel.id);
@@ -128,7 +131,8 @@ const teamsReducer=createSlice({
                     }
           }
 })
-export const {loadTeams, addTeamChatMessage, loadMoreMessages,
-                    loadChannelMeetings, updateMeetings,deleteMeeting,
-           updateMembers, updateChannels, removeChannel, updateTeam, deleteTeam} =teamsReducer.actions;
+export const {loadTeams,loadMoreTeams, addTeamChatMessage, loadMoreMessages,
+            loadChannelMeetings, addMeeting,deleteMeeting,
+           addMembers, addChannel, removeChannel, 
+           updateTeam, deleteTeam} =teamsReducer.actions;
 export default teamsReducer.reducer;

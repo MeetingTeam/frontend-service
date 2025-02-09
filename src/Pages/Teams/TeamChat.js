@@ -4,10 +4,11 @@ import TextChannel from "./TextChannel/TextChannel.js";
 import { useEffect } from "react";
 import TeamMemberAPI from "../../APIs/team-service/TeamMemberAPI.js";
 import { useDispatch } from "react-redux";
-import { updateMembers } from "../../Redux/teamsReducer.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 import { channelTypes } from "../../Utils/Constraints.js";
 import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
+import VideoChannel from "./VideoChannel/VideoChannel.js";
+import { addMembers } from "../../Redux/teamsReducer.js";
 
 const TeamChat=({team, channel,channelInfo})=>{
           const dispatch=useDispatch();
@@ -15,18 +16,13 @@ const TeamChat=({team, channel,channelInfo})=>{
 
           useEffect(()=>{
                     if(!team.members){
-                        console.log("send")
                               TeamMemberAPI.getMembersOfTeam(team.id).then(res=>{
-                                        console.log("members", res.data)
-                                        dispatch(updateMembers({
+                                        dispatch(addMembers({
                                                 teamId: team.id, 
                                                 newMembers: res.data
                                         }));
                               })
-                              .catch(err=>{
-                                        showErrorMessage(handleAxiosError(err));
-                                        console.log("err", err);
-                                });
+                              .catch(err=>showErrorMessage(handleAxiosError(err)));
                     }
           },[])
          return (

@@ -27,14 +27,14 @@ const DataLoading=({children})=>{
         .catch(err=>alertError("Unable to load data. Please try again"));
       }
       if(!friends){
-        FriendAPI.getFriends().then(res=>{
-                dispatch(loadFriends(res.data))
+        FriendAPI.getFriends(0, 10).then(res=>{
+                dispatch(loadFriends(res.data.data))
         })
         .catch(err=>alertError("Unable to load data. Please try again"));
       }
       if(!teams){
-        TeamAPI.getJoinedTeams().then(res=>{
-          dispatch(loadTeams(res.data));
+        TeamAPI.getJoinedTeams(0, 10).then(res=>{
+          dispatch(loadTeams(res.data.data));
         })
         .catch(err=>alertError("Unable to load data. Please try again"));
       }

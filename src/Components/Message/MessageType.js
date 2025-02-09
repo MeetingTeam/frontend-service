@@ -3,6 +3,7 @@ import VideoIcon from "../../Resources/VideoIcon.png"
 import AudioIcon from "../../Resources/AudioIcon.png"
 import FileIcon from "../../Resources/FileIcon.jpg"
 import { messageTypes } from "../../Utils/Constraints.js"
+import { getFileSize } from "../../Utils/FileUtil.js"
 
 const MessageType=({message})=>{
     if(message.type==messageTypes.TEXT)
@@ -20,7 +21,7 @@ const MessageType=({message})=>{
                     <div>
                             <img src={VideoIcon} type={mediaFile.fileType} alt="VideoIcon" width="40px" height="40px"/>
                             <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
-                            <small>{mediaFile.fileSizeInBytes} bytes</small>
+                            <small>{getFileSize(mediaFile.fileSizeInBytes)}</small>
                     </div>
                 )
         }
@@ -29,7 +30,7 @@ const MessageType=({message})=>{
                     <div>
                             <img src={AudioIcon} type={mediaFile.fileType} alt="AudioIcon" width="40px" height="40px"/>
                             <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
-                            <small>{mediaFile.fileSizeInBytes} bytes</small>
+                            <small>{getFileSize(mediaFile.fileSizeInBytes)}</small>
                     </div>
                 )
         }
@@ -38,7 +39,7 @@ const MessageType=({message})=>{
                 <div>
                         <img src={FileIcon} alt="FileIcon" width="40px" height="40px"/>
                         <a href={mediaFile.fileUrl}>{mediaFile.fileName}</a><br/>
-                        <small>{mediaFile.fileSizeInBytes} bytes</small>
+                        <small>{getFileSize(mediaFile.fileSizeInBytes)}</small>
                 </div>
             )
         }

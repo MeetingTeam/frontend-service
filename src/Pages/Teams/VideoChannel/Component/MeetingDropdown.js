@@ -1,89 +1,82 @@
 import { useDispatch, useSelector } from "react-redux";
-import { reactMeeting } from "../../../../Util/WebSocketService.js";
-import { addToCalendar, cancelMeeting, deleteMeeting, registerEmailNotification } from "../../../../old-API/MeetingAPI.js";
-import { updateMeetings } from "../../../../Redux/teamsReducer.js";
 import { updateCalendarMeetingIds } from "../../../../Redux/userReducer.js";
+import MeetingAPI from "../../../../APIs/meeting-service/MeetingAPI.js";
+import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import CalendarAPI from "../../../../APIs/meeting-service/CalendarAPI.js";
+import { emojiCodes } from "../../../../Utils/Constraints.js";
 
-const MeetingDropdown=({team,setMeetingDTO,meeting})=>{
+const MeetingDropdown=({setMeetingDTO,meeting})=>{
           const dispatch=useDispatch();
           const user=useSelector(state=>state.user);
-          const emojiCodes = ["2764", "1F600", "1F641", "1F642"];
+          const { showErrorMessage } = useSnackbarUtil();
+         
           function handleEmoji(e,emojiCode){
               e.preventDefault();
-              reactMeeting(meeting.id, {
-                    userId: user.id,
-                    emojiCode: emojiCode
-              })
+              MeetingAPI.reactMeeting(meeting.id, emojiCode)
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
-          function handleEmailSwitch(){
-                registerEmailNotification(meeting.id,!meeting.emailsReceivedNotification.has(user.email)).then(res=>{
-                    const emails=new Set([...meeting.emailsReceivedNotification]);
-                    if(emails.has(user.email)) emails.delete(user.email);
-                    else  emails.add(user.email);
-                    dispatch(updateMeetings({teamId:team.id, meeting:{...meeting, emailsReceivedNotification:emails}}))
-                })
-                .catch(err=>console.log(err))
-          }
-          function handleCalendarSwitch(){
-                addToCalendar(meeting.id,!user.calendarMeetingIds.has(meeting.id)).then(res=>{
+          function handleCalendarSwitch(e){
+               CalendarAPI.addToCalendar(meeting.id,!e.target.checked).then(res=>{
                     const meetingIds=new Set([...user.calendarMeetingIds]);
                     if(meetingIds.has(meeting.id)) meetingIds.delete(meeting.id)
                     else meetingIds.add(meeting.id);
                     dispatch(updateCalendarMeetingIds(meetingIds))
                 })
-                .catch(err=>console.log(err))
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
-          function handleCancelSwitch(){
-            cancelMeeting(meeting.id).catch(err=>console.log(err));
+          function handleCancelSwitch(e){
+            MeetingAPI.cancelMeeting(meeting.id, e.target.checked)
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleEditMeeting(){
             setMeetingDTO({
                 id: meeting.id,
                 title: meeting.title,
-                scheduledTime: new Date(meeting.scheduledTime),
-                scheduledDaysOfWeek: new Set(meeting.scheduledDaysOfWeek),
-                endDate: new Date(meeting.endDate)
+                scheduledTime: meeting.scheduledTime,
+                scheduledDaysOfWeek: meeting.scheduledDaysOfWeek,
+                endDate: meeting.endDate
             })
           }
           function handleDeleteBtn(){
-            deleteMeeting(meeting.id).catch(err=>alert(err));
+            MeetingAPI.deleteMeeting(meeting.id)
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
+          function checkAddToCalendar(){
+                if(!meeting||!meeting.calendarUserIds) return false;
+                return meeting.calendarUserIds.find(calendarUserId=>calendarUserId==user.id);
+          }
+          
           return(
                     <div className="dropdown">
                               <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id={"meetingDropdown"+meeting.id}>
                                         Settings
                               </button>
-                              <ul className="dropdown-menu" aria-labelledby={"meetingDropdown"+meeting.id}>
-                                        {meeting.creatorId===user.id&&<li><a href="#" className="dropdown-item" onClick={handleEditMeeting}>Edit meeting</a></li>}
-                                        {meeting.creatorId===user.id&&<li><a className="dropdown-item" onClick={handleDeleteBtn}>Delete Meeting</a></li>}
+                              <div className="dropdown-menu" aria-labelledby={"meetingDropdown"+meeting.id}>
+                                        {meeting.creatorId===user.id&&
+                                            <button href="#" className="dropdown-item" onClick={handleEditMeeting}>Edit meeting</button>}
+                                        {meeting.creatorId===user.id&&
+                                            <button className="dropdown-item" onClick={handleDeleteBtn}>Delete Meeting</button>}
                                         {meeting.creatorId==user.id&&
-                                            <li><div className="form-check form-switch">
-                                                <input className="form-check-input" type="checkbox" role="switch" id={"isCanceled"+meeting.id} 
-                                                        checked={meeting.isCanceled} onChange={handleCancelSwitch}/>
-                                                <label className="form-check-label" htmlFor={"isCanceled"+meeting.id}>Cancel meeting</label>
-                                            </div></li>}
-                                            <li><div className="form-check form-switch">
+                                            <div className="form-check form-switch">
                                                 <input className="form-check-input" type="checkbox" role="switch"
-                                                     checked={user.calendarMeetingIds.has(meeting.id)} 
-                                                     onChange={handleCalendarSwitch}  id={"isCanceled"+meeting.id}/>
-                                                <label className="form-check-label" htmlFor={"isCanceled"+meeting.id}>Add to calender</label>
-                                            </div></li>
-                                            <li><div className="form-check form-switch">
-                                                <input className="form-check-input" type="checkbox" role="switch" 
-                                                    id={"isCanceled"+meeting.id} 
-                                                    checked={meeting.emailsReceivedNotification.has(user.email)} 
-                                                    onChange={handleEmailSwitch}/>
-                                                <label className="form-check-label" htmlFor={"isCanceled"+meeting.id}>Receive email notification</label>
-                                            </div></li>
-                                            <li><div className="d-flex align-items-center bg-light rounded-pill p-2 reaction-list">
-                                                  {emojiCodes.map((code, index)=>
-                                                            <span className="fs-4 me-2" key={index} onClick={(e)=>handleEmoji(e, code)}>
-                                                                {String.fromCodePoint(`0x${code}`)}
+                                                         onChange={e=>handleCancelSwitch(e)}/>
+                                                <div className="form-check-label">Cancel meeting</div>
+                                            </div>}
+                                            <div className="form-check form-switch">
+                                                <input className="form-check-input" type="checkbox" role="switch"
+                                                     onChange={e=>handleCalendarSwitch(e)} />
+                                                <div className="form-check-label">Add to calender</div>
+                                            </div>
+                                            <div className="d-flex align-items-center bg-light rounded-pill reaction-list">
+                                                  {emojiCodes.map((emojiCode, index)=>
+                                                            <span className="fs-4 me-2" key={index} onClick={(e)=>handleEmoji(e, emojiCode)}>
+                                                                {emojiCode}
                                                             </span>
                                                   )}
                                                   <span className="fs-4 me-2" onClick={(e)=>handleEmoji(e, null)}>X</span>
-                                        </div></li>
-                              </ul>
+                                        </div>
+                              </div>
                     </div>
           )
 }

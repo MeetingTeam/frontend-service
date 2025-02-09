@@ -1,69 +1,75 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { getDate, getTime } from "../../../../Util/DateTimeUtil.js";
-import { createMeeting, updateMeeting } from "../../../../old-API/MeetingAPI.js";
-import { useSnackbar } from "notistack";
+import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
+import MeetingAPI from "../../../../APIs/meeting-service/MeetingAPI.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import { DateTime } from "luxon";
+import { getHourMinuteOnly, getTime } from "../../../../Utils/DateTimeUtil.js";
 
-const MeetingModal=({meeting,setShow, noChange})=>{
-         const { enqueueSnackbar } = useSnackbar();
-          const [dto, setDTO]=useState({...meeting});
-          const [error, setError]=useState({txtScheduledTime:null, txtEndDate: null})
-          const beginDateRef = useRef();
-          const beginTimeRef = useRef();
-         const daysOfWeek=["Sun","Mon","Tue","Wed","Thu","Fri","Sar"];
-          function handleOnChange(e, fieldName, day){
+const daysOfWeek=["Sun","Mon","Tue","Wed","Thu","Fri","Sar"];
+const MeetingModal=({meeting, setShow, noChange})=>{
+          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
+          const [meetingDTO, setMeetingDTO]=useState({...meeting});
+          const [error, setError]=useState({
+                txtTitle:null,
+                txtScheduledTime:null, 
+                txtEndDate: null
+          })
+          
+         function handleOnChange(e, fieldName, day){
                 let value=null;
-                if(fieldName=="title"||fieldName=="endDate") value=e.target.value;
+                if(fieldName=="scheduledDaysOfWeek"){
+                        let hasDay=false;
+                        value=meetingDTO.scheduledDaysOfWeek.filter(scheduledDay=>{
+                                if(day==scheduledDay){
+                                        hasDay=true;
+                                }
+                                return !(day==scheduledDay);
+                        });
+                        if(!hasDay) value.push(day);
+                }
                 else if(fieldName=="scheduledTime"){
-                        value=beginDateRef.current.value+"T"+beginTimeRef.current.value;
+                        value=e.target.value+":00.000";
                 }
-                else if(fieldName=="scheduledDaysOfWeek"){
-                        value=dto.scheduledDaysOfWeek;
-                        if(value.has(day)) value.delete(day);
-                        else  value.add(day);
-                }
-                setDTO(prev=>{
-                        const updatedDTO={...prev}
-                        updatedDTO[fieldName]=value;
-                        return updatedDTO;
-                })
-          }
-          function showSnackbar(content, isSuccess){
-                const config = {variant:(isSuccess?"success":"error"),anchorOrigin:{ horizontal: 'center' , vertical: 'bottom'}}
-                enqueueSnackbar(content, config);
+                else value=e.target.value;
+
+                var updatedMeeting= {...meetingDTO};
+                updatedMeeting[fieldName]=value;
+                setMeetingDTO(updatedMeeting);
           }
           function validateData(){
-                let txtScheduledTime=null, txtEndDate= null;
-                if(!dto.scheduledTime) txtScheduledTime="Schedule Time is required";
+                let txtTitle, txtScheduledTime=null, txtEndDate= null;
+                if(!meetingDTO.title||meetingDTO.title=="") txtTitle="Title must not be empty";
+                if(!meetingDTO.scheduledTime) txtScheduledTime="Schedule Time is required";
                 else {
-                        var beginDate=new Date(dto.scheduledTime);
-                        if(dto.endDate){
-                                dto.endDate =new Date(dto.endDate);
-                                if(beginDate>dto.endDate) txtEndDate="End time must be after start date";
+                        var startDateTime= DateTime.fromISO(meetingDTO.startDate)
+                        if(meetingDTO.endDate){
+                                var endDateTime =DateTime.fromISO(meetingDTO.endDate);
+                                if(startDateTime>endDateTime) txtEndDate="End time must be after start date";
                         }
                 }
-                setError({txtScheduledTime, txtEndDate})
-                return !(txtScheduledTime||txtEndDate);
+                setError({txtTitle, txtScheduledTime, txtEndDate})
+                return !(txtTitle||txtScheduledTime||txtEndDate);
           }
           function handleSubmit(e){
                 e.preventDefault();
                 if(validateData()){
-                        const result={...dto};
-                        result.scheduledDaysOfWeek=[...dto.scheduledDaysOfWeek];
-                        result.createdAt=new Date();
-                        console.log("Result", JSON.stringify(result));
-                        if(!dto.id) createMeeting(result).
+                        if(!meetingDTO.id) {
+                                MeetingAPI.createMeeting(meetingDTO).
                                         then(res=>{
-                                                showSnackbar("create new meeting successfully",true);
+                                                showErrorMessage("Create new meeting successfully");
                                                 setShow(null);
                                         })
-                                        .catch(err=>showSnackbar(err.response.data,false));
-                        else updateMeeting(result)
+                                        .catch(err=>showErrorMessage(handleAxiosError(err)));
+                        }
+                        else {
+                                MeetingAPI.updateMeeting(meetingDTO)
                                 .then(res=>{
-                                        showSnackbar("update meeting successfully", true);
+                                        showSuccessMessage("Update meeting successfully");
                                         setShow(null);
                                 })
-                                .catch(err=>showSnackbar(err.response.data,false));
+                                .catch(err=>showErrorMessage(handleAxiosError(err)));
+                        }
                 }
           }
           return(
@@ -76,14 +82,18 @@ const MeetingModal=({meeting,setShow, noChange})=>{
                                         <Row className="mb-3">
                                                 <Form.Group as={Col} controlId="title">
                                                         <Form.Label>Title</Form.Label>
-                                                        <Form.Control type="text" onChange={(e)=>handleOnChange(e,"title")} defaultValue={dto.title}/>
+                                                        <Form.Control type="text" onChange={(e)=>handleOnChange(e,"title")} defaultValue={meetingDTO.title}/>
+                                                        <div style={error.txtTitle ? { display: ''} : { display: 'none' }} className="error">{error.txtTitle}</div>
                                                 </Form.Group>
                                         </Row>
                                         <Row className="mb-3">
+                                                <Form.Group as={Col} controlId="startDate" disabled={meetingDTO.scheduledDaysOfWeek.size==0}>
+                                                        <Form.Label>Start Date</Form.Label>
+                                                        <Form.Control type="date" onChange={(e)=>handleOnChange(e,"startDate")} defaultValue={meeting.startDate}/>
+                                                </Form.Group>
                                                 <Form.Group as={Col} controlId="scheduledTime">
-                                                        <Form.Label>Start Time</Form.Label>
-                                                        <Form.Control type="time" ref={beginTimeRef} onChange={(e)=>handleOnChange(e,"scheduledTime")} defaultValue={getTime(meeting.scheduledTime)}/>
-                                                        <Form.Control type="date" ref={beginDateRef} onChange={(e)=>handleOnChange(e,"scheduledTime")} defaultValue={getDate(meeting.scheduledTime)}/>
+                                                        <Form.Label>Schedule Time</Form.Label>
+                                                        <Form.Control type="time" onChange={(e)=>handleOnChange(e,"scheduledTime")} defaultValue={getHourMinuteOnly(meeting.scheduledTime)}/>
                                                         <div style={error.txtScheduledTime ? { display: ''} : { display: 'none' }} className="error">{error.txtScheduledTime}</div>
                                                 </Form.Group>
                                         </Row>
@@ -94,7 +104,7 @@ const MeetingModal=({meeting,setShow, noChange})=>{
                                                 <div className="col-auto">
                                                         <div className="btn-group" role="group" aria-label="Days of the Week">
                                                                 {daysOfWeek.map((day, index)=>{
-                                                                        let isChoosed=dto.scheduledDaysOfWeek.has(index+1);
+                                                                        let isChoosed=meetingDTO.scheduledDaysOfWeek.find(day=>day==index+1);
                                                                         return(
                                                                                 <button key={index} type="button" className={"btn btn-circle "+(isChoosed?"btn-primary":"btn-light")} onClick={(e)=>handleOnChange(e,"scheduledDaysOfWeek", index+1)}>
                                                                                         {day}
@@ -105,9 +115,9 @@ const MeetingModal=({meeting,setShow, noChange})=>{
                                                 </div>
                                         </Row>
                                         <Row className="mb-3">
-                                                <Form.Group as={Col} controlId="endDate" disabled={dto.scheduledDaysOfWeek.size==0}>
+                                                <Form.Group as={Col} controlId="endDate" disabled={meetingDTO.scheduledDaysOfWeek.size==0}>
                                                         <Form.Label>End Date(if schedule meeting repeatly)</Form.Label>
-                                                        <Form.Control type="date" onChange={(e)=>handleOnChange(e,"endDate")} defaultValue={getDate(meeting.endDate)}/>
+                                                        <Form.Control type="date" onChange={(e)=>handleOnChange(e,"endDate")} defaultValue={meeting.endDate}/>
                                                         <div style={error.txtEndDate? { display: ''} : { display: 'none' }} className="error">{error.txtEndDate}</div>
                                                 </Form.Group>
                                         </Row>
