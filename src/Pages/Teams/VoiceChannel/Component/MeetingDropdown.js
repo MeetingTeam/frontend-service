@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
-import { updateCalendarMeetingIds } from "../../../../Redux/userReducer.js";
 import MeetingAPI from "../../../../APIs/meeting-service/MeetingAPI.js";
 import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 import CalendarAPI from "../../../../APIs/meeting-service/CalendarAPI.js";
 import { emojiCodes } from "../../../../Utils/Constraints.js";
+import { addMeeting } from "../../../../Redux/teamsReducer.js";
 
 const MeetingDropdown=({setMeetingDTO,meeting})=>{
           const dispatch=useDispatch();
@@ -17,11 +17,14 @@ const MeetingDropdown=({setMeetingDTO,meeting})=>{
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleCalendarSwitch(e){
-               CalendarAPI.addToCalendar(meeting.id,!e.target.checked).then(res=>{
-                    const meetingIds=new Set([...user.calendarMeetingIds]);
-                    if(meetingIds.has(meeting.id)) meetingIds.delete(meeting.id)
-                    else meetingIds.add(meeting.id);
-                    dispatch(updateCalendarMeetingIds(meetingIds))
+               CalendarAPI.addToCalendar(meeting.id,e.target.checked).then(res=>{
+                    const updatedMeeting= {...meeting};
+                    updatedMeeting.calendarUserIds=meeting
+                                                .calendarUserIds
+                                                .filter(calendarUserId=>calendarUserId!=user.id)
+                    if(e.target.checked=="true")
+                        updatedMeeting.calendarUserIds.push(user.id);
+                    dispatch(addMeeting(updatedMeeting));
                 })
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
@@ -30,13 +33,7 @@ const MeetingDropdown=({setMeetingDTO,meeting})=>{
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleEditMeeting(){
-            setMeetingDTO({
-                id: meeting.id,
-                title: meeting.title,
-                scheduledTime: meeting.scheduledTime,
-                scheduledDaysOfWeek: meeting.scheduledDaysOfWeek,
-                endDate: meeting.endDate
-            })
+            setMeetingDTO({...meeting});
           }
           function handleDeleteBtn(){
             MeetingAPI.deleteMeeting(meeting.id)
@@ -60,12 +57,12 @@ const MeetingDropdown=({setMeetingDTO,meeting})=>{
                                         {meeting.creatorId==user.id&&
                                             <div className="form-check form-switch">
                                                 <input className="form-check-input" type="checkbox" role="switch"
-                                                         onChange={e=>handleCancelSwitch(e)}/>
+                                                        checked={meeting.isCanceled} onChange={e=>handleCancelSwitch(e)}/>
                                                 <div className="form-check-label">Cancel meeting</div>
                                             </div>}
                                             <div className="form-check form-switch">
                                                 <input className="form-check-input" type="checkbox" role="switch"
-                                                     onChange={e=>handleCalendarSwitch(e)} />
+                                                    checked={checkAddToCalendar()} onChange={e=>handleCalendarSwitch(e)} />
                                                 <div className="form-check-label">Add to calender</div>
                                             </div>
                                             <div className="d-flex align-items-center bg-light rounded-pill reaction-list">

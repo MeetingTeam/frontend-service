@@ -4,7 +4,7 @@ import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
 import MeetingAPI from "../../../../APIs/meeting-service/MeetingAPI.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 import { DateTime } from "luxon";
-import { getHourMinuteOnly, getTime } from "../../../../Utils/DateTimeUtil.js";
+import { getHourMinuteOnly} from "../../../../Utils/DateTimeUtil.js";
 
 const daysOfWeek=["Sun","Mon","Tue","Wed","Thu","Fri","Sar"];
 const MeetingModal=({meeting, setShow, noChange})=>{
@@ -12,9 +12,8 @@ const MeetingModal=({meeting, setShow, noChange})=>{
           const [meetingDTO, setMeetingDTO]=useState({...meeting});
           const [error, setError]=useState({
                 txtTitle:null,
-                txtScheduledTime:null, 
                 txtEndDate: null
-          })
+          });
           
          function handleOnChange(e, fieldName, day){
                 let value=null;
@@ -38,18 +37,15 @@ const MeetingModal=({meeting, setShow, noChange})=>{
                 setMeetingDTO(updatedMeeting);
           }
           function validateData(){
-                let txtTitle, txtScheduledTime=null, txtEndDate= null;
+                let txtTitle, txtEndDate= null;
                 if(!meetingDTO.title||meetingDTO.title=="") txtTitle="Title must not be empty";
-                if(!meetingDTO.scheduledTime) txtScheduledTime="Schedule Time is required";
-                else {
+                else if(meeting.startDate&&meeting.endDate) {
                         var startDateTime= DateTime.fromISO(meetingDTO.startDate)
-                        if(meetingDTO.endDate){
-                                var endDateTime =DateTime.fromISO(meetingDTO.endDate);
-                                if(startDateTime>endDateTime) txtEndDate="End time must be after start date";
-                        }
+                        var endDateTime =DateTime.fromISO(meetingDTO.endDate);
+                        if(startDateTime>endDateTime) txtEndDate="End time must be after start date";
                 }
-                setError({txtTitle, txtScheduledTime, txtEndDate})
-                return !(txtTitle||txtScheduledTime||txtEndDate);
+                setError({txtTitle, txtEndDate})
+                return !(txtTitle||txtEndDate);
           }
           function handleSubmit(e){
                 e.preventDefault();
@@ -57,7 +53,7 @@ const MeetingModal=({meeting, setShow, noChange})=>{
                         if(!meetingDTO.id) {
                                 MeetingAPI.createMeeting(meetingDTO).
                                         then(res=>{
-                                                showErrorMessage("Create new meeting successfully");
+                                                showSuccessMessage("Create new meeting successfully");
                                                 setShow(null);
                                         })
                                         .catch(err=>showErrorMessage(handleAxiosError(err)));
@@ -94,7 +90,6 @@ const MeetingModal=({meeting, setShow, noChange})=>{
                                                 <Form.Group as={Col} controlId="scheduledTime">
                                                         <Form.Label>Schedule Time</Form.Label>
                                                         <Form.Control type="time" onChange={(e)=>handleOnChange(e,"scheduledTime")} defaultValue={getHourMinuteOnly(meeting.scheduledTime)}/>
-                                                        <div style={error.txtScheduledTime ? { display: ''} : { display: 'none' }} className="error">{error.txtScheduledTime}</div>
                                                 </Form.Group>
                                         </Row>
                                         <Row className="mb-3">

@@ -27,6 +27,12 @@ export const channelTypes={
           VOICE_CHANNEL: "VOICE_CHANNEL"
 }
 
+export const teamRoles={
+          LEADER: "LEADER",
+          MEMBER: "MEMBER",
+          LEAVE: "LEAVE"
+}
+
 // Tab Titles
 export const tabTitles=["Members", "Pending Requests", "Channels","Settings"]
 

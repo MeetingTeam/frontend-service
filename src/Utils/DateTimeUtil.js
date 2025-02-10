@@ -35,14 +35,14 @@ export function getScheduledTime(meeting){
           if(!scheduledTime) return "";
           const daysOfWeek=["","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Sartuday"]
           const time=DateTime.fromFormat(scheduledTime, "HH:mm:ss");
-          if(scheduledDaysOfWeek&&scheduledDaysOfWeek.size>0){
+          if(scheduledDaysOfWeek&&scheduledDaysOfWeek.length>0){
                     let result="Occurs every ";
                     scheduledDaysOfWeek.forEach(day=>{result+=daysOfWeek[day]+","})
                     result+=" at "+time.toFormat("HH:mm");
                     result+=", from "+time.toFormat("dd-MM-yyyy");
                     if(endDate){
-                              const endDate=DateTime.fromISO(endDate);
-                              result+=" to "+endDate.toFormat("dd-MM-yyyy");
+                              const endDateTime=DateTime.fromISO(endDate);
+                              result+=" to "+endDateTime.toFormat("dd-MM-yyyy");
                     }
                     return result;
           }

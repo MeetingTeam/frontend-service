@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./TeamDetails.css"
 import { Link } from "react-router-dom";
 import Members from "./Members/Members.js";
@@ -6,7 +5,7 @@ import PendingRequest from "./PendingRequests/PendingRequest.js";
 import Settings from "./Settings/Settings.js";
 import Channels from "./Channels/Channels.js";
 import { useSelector } from "react-redux";
-import { tabTitles } from "../../../Util/Constraints.js";
+import { tabTitles, teamRoles } from "../../../Utils/Constraints.js";
 
 const TeamDetails=({team, channelInfo, setChannelInfo})=>{
             const user=useSelector(state=>state.user);
@@ -15,7 +14,7 @@ const TeamDetails=({team, channelInfo, setChannelInfo})=>{
                 setChannelInfo({...channelInfo, tabIndex:tabIndex});
            }
           return(
-                    <>
+                <>
                     <div className="chat-header clearfix">
                         <div className="row">
                             <div className="col-lg-9">
@@ -30,7 +29,7 @@ const TeamDetails=({team, channelInfo, setChannelInfo})=>{
                     </div>
                     <div className="chat-history">
                             {channelInfo.tabIndex==0&&<Members team={team}/>}
-                            {channelInfo.tabIndex==1&&(roleOfUser=="LEADER"||roleOfUser=="DEPUTY")
+                            {channelInfo.tabIndex==1&&(roleOfUser==teamRoles.LEADER)
                                 &&<PendingRequest team={team}/>}
                             {channelInfo.tabIndex==2&&<Channels team={team}/>}
                             {channelInfo.tabIndex==3&&<Settings team={team}/>}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import Avatar from "../../../../Components/Avatar/Avartar.js";
 import { addFriendsToTeam } from "../../../../old-API/TeamAPI.js";
@@ -24,6 +24,10 @@ const FriendsListModal=({team, setShow})=>{
                     </Modal.Header>
                     <Modal.Body>
                               <Form>
+                              <InputGroup>
+                                        <InputGroup.Text><i className="fa fa-search"></i></InputGroup.Text>
+                                        <FormControl type="text" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)} />
+                                </InputGroup>
                               {friends.map(friend=>{
                                         let index=members.findIndex(member=>member.u.id==friend.id);
                                         if(index===-1||members[index].role=="LEAVE") return(

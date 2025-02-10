@@ -27,7 +27,7 @@ const TextChannel=({team, channel, channelInfo})=>{
             const [replyMessage, setReplyMessage]=useState(null);
             const [reactions, setReactions]=useState(null);
             const [showVoting, setShowVoting]=useState({type:0, message:null});
-            
+
             useEffect(()=>{
                 if(!channel.messages){
                     MessageAPI.getTextChannelMessages(0, channel.id).then(res=>{
@@ -36,7 +36,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                             messages: res.data}))
                     })
                 }
-            },[channel])
+            },[team, channelInfo])
             
             function submitMessage(e){
                 e.preventDefault();

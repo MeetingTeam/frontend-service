@@ -2,7 +2,11 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import ChannelModal from "./ChannelModal.js";
 import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
-import { deleteChannel } from "../../../../old-API/ChannelAPI.js";
+import { channelTypes } from "../../../../Utils/Constraints.js";
+import ChannelAPI from "../../../../APIs/team-service/ChannelAPI.js";
+import { alertError } from "../../../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+
 const Channels=({team})=>{
           const user=useSelector(state=>state.user);
           const [searchTerm, setSearchTerm]=useState("");
@@ -18,7 +22,7 @@ const Channels=({team})=>{
                     setUpdatedChannel({
                               teamId: team.id,
                               channelName:"",
-                              type:"TEXT_CHANNEL",
+                              type: channelTypes.CHAT_CHANNEL,
                               description:""
                     })                
           }
@@ -30,7 +34,8 @@ const Channels=({team})=>{
           }
           function handleDeleteButton(e,channelId){
                     e.preventDefault();
-                    deleteChannel(channelId);
+                    ChannelAPI.deleteChannel(channelId)
+                        .catch(err=>alertError(handleAxiosError(err)));
           }
           const filterChannels=(search=="")?team.channels:team.channels.filter(handleFilter)
           return(

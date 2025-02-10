@@ -1,15 +1,19 @@
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { updateChannel } from "../../../../old-API/ChannelAPI.js";
+import ChannelAPI from "../../../../APIs/team-service/ChannelAPI.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 
 const  ChannelModal=({channel,setChannel})=>{
+        const { showErrorMessage, showSuccessMessage } = useSnackbarUtil();
           function handleOnChange(e, fieldName){
                   channel[fieldName]=e.target.value;
           }
           function handleSubmit(e){
                   e.preventDefault();
-                  updateChannel(channel).then(res=>{
+                  ChannelAPI.updateChannel(channel).then(res=>{
                         setChannel(null);
-                  });
+                        showSuccessMessage("Update channel successfully");
+                  })
+                  .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           return(
                   <Modal show={true} onHide={()=>setChannel(null)}>

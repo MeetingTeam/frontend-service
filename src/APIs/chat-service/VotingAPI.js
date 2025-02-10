@@ -3,7 +3,7 @@ import { CHAT_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const votingEndpoint= CHAT_SERVICE_ENDPOINT+"/voting"
 class VotingAPI {
-          sendVotingMessage(messageDto){
+          createVoting(messageDto){
                     return AxiosService.post(votingEndpoint, messageDto);
           }
 

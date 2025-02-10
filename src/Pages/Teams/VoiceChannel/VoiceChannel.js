@@ -1,4 +1,4 @@
-import "./VideoChannel.css"
+import "./VoiceChannel.css"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadChannelMeetings } from "../../../Redux/teamsReducer.js";
@@ -14,7 +14,7 @@ import ReactionDetails from "../../../Components/Message/ReactionDetails.js";
 import ReactionList from "../../../Components/Message/ReactionList.js";
 import Avatar from "../../../Components/Avatar/Avartar.js";
 
-const VideoChannel=({team, channel, channelInfo})=>{
+const VoiceChannel=({team, channel, channelInfo})=>{
           const dispatch=useDispatch();
           const navigate= useNavigate();
           const { showErrorMessage } = useSnackbarUtil();
@@ -25,12 +25,11 @@ const VideoChannel=({team, channel, channelInfo})=>{
           useEffect(()=>{
               if(!channel.meetings){
                   MeetingAPI.getMeetingsOfVideoChannel(channel.id,0).then(res=>{
-                      console.log("res", res.data)
                       dispatch(loadChannelMeetings({channelInfo, meetings:res.data}))
                   })
                   .catch(err=>showErrorMessage(handleAxiosError(err)));
               }
-          },[channel])
+          },[team, channelInfo])
           
           function handleScheduleButton(e){
             e.preventDefault();
@@ -59,7 +58,7 @@ const VideoChannel=({team, channel, channelInfo})=>{
               }).catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleAddMeetingsButton(){
-                MeetingAPI.getVideoChannelMeetings(channel.id,channel.meetings.length).then(res=>{
+                MeetingAPI.getMeetingsOfVideoChannel(channel.id,channel.meetings.length).then(res=>{
                     dispatch(loadChannelMeetings({channelInfo, meetings:res.data}))
                 })
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
@@ -100,9 +99,9 @@ const VideoChannel=({team, channel, channelInfo})=>{
                                                             <p className="card-text">{getScheduledTime(meeting)}</p>
                                                   </div>
                                         </div>
-                                        <div className="mt-3 d-flex justify-content-between align-items-center">
-                                                  {!meeting.isCanceled&&<Link to={"/videoCall?meetingId="+meeting.id} className="btn btn-warning">Join</Link>}
-                                                  <MeetingDropdown team={team} setMeeting={setMeeting} meeting={meeting}/>
+                                        <div className="mt-3 d-flex justify-content-between">
+                                                  <button className="btn btn-warning" onClick={()=>navigate("/videoCall?meetingId="+meeting.id)}  disabled={meeting.isCanceled}>Join</button>
+                                                  <MeetingDropdown team={team} setMeetingDTO={setMeeting} meeting={meeting}/>
                                                   <ReactionList reactions={meeting.reactions} setReactions={setReactions}/>
                                      </div>
                                  </div>
@@ -128,4 +127,4 @@ const VideoChannel=({team, channel, channelInfo})=>{
             </> 
           )
 }
-export default VideoChannel;
+export default VoiceChannel;

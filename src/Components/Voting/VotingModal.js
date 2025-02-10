@@ -34,18 +34,18 @@ const VotingModal=({message,nickName, setShow})=>{
           return(
                     <Modal show={true} onHide={()=>setShow(0)}>
                               <Modal.Header closeButton>
-                                      <Modal.Title>{message.content}</Modal.Title>
+                                      <Modal.Title>{message.voting.title}</Modal.Title>
                               </Modal.Header>
                               <Modal.Body>
                                   <Form>
                                         {message.voting.options?.map((option,index)=>
-                                                  <Form.Check key={index} type={type} name="votingOption" disabled={message.voting.isBlocked}
+                                                  <Form.Check key={index} type={type} name="votingOption"
                                                             label={option.name} onClick={()=>clickOption(option.name)}/>
                                         )} 
                                   </Form>
                               </Modal.Body>
                               <Modal.Footer>
-                                  <Button variant="primary" onClick={(e)=>handleSubmit(e)}>Submit</Button>
+                                  <Button size="sm" variant="primary" onClick={(e)=>handleSubmit(e)}>Submit</Button>
                               </Modal.Footer>
                   </Modal>
           )

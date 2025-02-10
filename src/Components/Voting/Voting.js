@@ -3,12 +3,16 @@ import "./Voting.css";
 import VotingAPI from "../../APIs/chat-service/VotingAPI.js";
 import { alertError } from "../../Utils/ToastUtil.js";
 import { getDateTime } from "../../Utils/DateTimeUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
 const Voting=({message,creatorNickName,setShow})=>{
           const user=useSelector(state=>state.user);
+          
           function handleBlockBtn(){
-            VotingAPI.blockVoting(message.id).catch(err=>alertError(err));
+            VotingAPI.blockVoting(message.id, creatorNickName)
+              .catch(err=>alertError(handleAxiosError(err)));
           }
+          
           let voteNum=0;
           for(let option of message.voting.options) voteNum+=option.userIds.length;
           return(
@@ -33,9 +37,9 @@ const Voting=({message,creatorNickName,setShow})=>{
                               )
                         })}
                     <div className="mt-3 d-flex justify-content-between align-items-center">
-                            <button type="button" className="btn btn btn-warning" onClick={()=>setShow({type:1, message})}> Vote </button>
-                            <button type="button" className="btn btn-info" onClick={()=>setShow({type:2, message})}>View TeamDetails</button>
-                            {user.id==message.senderId&&<button type="button" className="btn btn-danger" onClick={handleBlockBtn}>Block</button>}
+                            <button type="button" className="btn btn-sm btn btn-warning" disabled={message.voting.isBlocked} onClick={()=>setShow({type:1, message})}> Vote </button>
+                            <button type="button" className="btn btn-sm btn-info" onClick={()=>setShow({type:2, message})}>View Details</button>
+                            {user.id==message.senderId&&<button type="button" className="btn btn-sm btn-danger" disabled={message.voting.isBlocked} onClick={handleBlockBtn}>Block</button>}
                     </div>
                     </div>                                                  
           </div>                   

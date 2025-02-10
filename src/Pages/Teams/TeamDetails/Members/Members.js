@@ -6,8 +6,10 @@ import Avatar from "../../../../Components/Avatar/Avartar.js";
 import FriendsListModal from "./FriendsListModal.js";
 import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
 import { unsubscribeByTeamId } from "../../../../Util/WebSocketService.js";
-import { useSnackbar } from "notistack";
 import { deleteTeam } from "../../../../Redux/teamsReducer.js";
+import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
+import TeamMemberAPI from "../../../../APIs/team-service/TeamMemberAPI.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 
 const Members=({team})=>{
           const user=useSelector(state=>state.user);
@@ -16,8 +18,8 @@ const Members=({team})=>{
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
           const [showFriendsList, setShowFriendsList]=useState(false);
-          const { enqueueSnackbar } = useSnackbar();
           const dispatch= useDispatch();
+          const { showErrorMessage, showSuccessMessage } = useSnackbarUtil();
           const handleFilter = (item) => {
                     const re = new RegExp("^"+search,"i");
                     return item.u.nickName.match(re);
@@ -25,10 +27,10 @@ const Members=({team})=>{
           let filterMembers=(search==="")?members:members.filter(handleFilter);
           function handleKickButton(e,memberId){
                 e.preventDefault();
-                kickMember(team.id, memberId).then(res=>{
-                    const config = {variant: 'success',anchorOrigin: {horizontal: 'center' , vertical: 'bottom'}}
-                    enqueueSnackbar('Kick member successfully', config);
-                });
+                TeamMemberAPI.kickMember(team.id, memberId).then(res=>{
+                    showSuccessMessage('Kick member successfully');
+                })
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleLeaveButton(){
                 leaveTeam(team.id).then(()=>{
