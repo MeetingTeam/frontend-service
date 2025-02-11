@@ -1,7 +1,6 @@
 export function handleAxiosError(axiosError){
-          console.log("Axios Error", axiosError)
           if(!axiosError.response||!axiosError.response.data)
-                    return "Unknown error";
+                    return errorDto.message;
           const errorDto= axiosError.response.data;
           let errorMessage="";
           if(errorDto.fieldErrors) {

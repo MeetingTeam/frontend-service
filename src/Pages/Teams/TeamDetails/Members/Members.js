@@ -1,30 +1,32 @@
 import { useState } from "react";
-import { getDateTime } from "../../../../Util/DateTimeUtil.js";
-import { kickMember, leaveTeam } from "../../../../old-API/TeamAPI.js";
 import { useDispatch, useSelector } from "react-redux";
 import Avatar from "../../../../Components/Avatar/Avartar.js";
 import FriendsListModal from "./FriendsListModal.js";
 import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
-import { unsubscribeByTeamId } from "../../../../Util/WebSocketService.js";
 import { deleteTeam } from "../../../../Redux/teamsReducer.js";
 import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
 import TeamMemberAPI from "../../../../APIs/team-service/TeamMemberAPI.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import { teamRoles } from "../../../../Utils/Constraints.js";
+import WebSocketService from "../../../../Services/WebSocketService.js";
+import { getDateTime } from "../../../../Utils/DateTimeUtil.js";
 
 const Members=({team})=>{
           const user=useSelector(state=>state.user);
           const members=team.members;
-          const roleOfUser=team.members.filter(member=>member.u.id===user.id)[0].role;
+          const roleOfUser=team.members.filter(member=>member.user.id===user.id)[0].role;
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
           const [showFriendsList, setShowFriendsList]=useState(false);
           const dispatch= useDispatch();
           const { showErrorMessage, showSuccessMessage } = useSnackbarUtil();
-          const handleFilter = (item) => {
-                    const re = new RegExp("^"+search,"i");
-                    return item.u.nickName.match(re);
-            }
-          let filterMembers=(search==="")?members:members.filter(handleFilter);
+         
+          const filterMembers=(search==="")?members:members.filter(handleFilter);
+          
+          function handleFilter(item) {
+            const re = new RegExp("^"+search,"i");
+            return item.user.nickName.match(re);
+         }
           function handleKickButton(e,memberId){
                 e.preventDefault();
                 TeamMemberAPI.kickMember(team.id, memberId).then(res=>{
@@ -33,17 +35,17 @@ const Members=({team})=>{
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleLeaveButton(){
-                leaveTeam(team.id).then(()=>{
-                    unsubscribeByTeamId(team.id);
+                TeamMemberAPI.leaveTeam(team.id).then(()=>{
+                    WebSocketService.unsubscribeByTeamId(team.id);
                     dispatch(deleteTeam(team.id));
-                    const config = {variant: 'info',anchorOrigin: {horizontal: 'center' , vertical: 'bottom'}}
-                    enqueueSnackbar("You have leaved the team "+team.teamName, config);
+                    showSuccessMessage("You have leaved the team "+team.teamName);
                 });
           }
+
           return(
             <>
             {showFriendsList&&<FriendsListModal team={team} setShow={setShowFriendsList}/>}
-          <div className="tablePage">
+            <div className="tablePage">
                     <div className="ContentAlignment" style={{marginBottom:"10px"}}>
                               <button type="button" className="btn btn-primary" onClick={()=>setShowFriendsList(true)}>Add new member</button>
                               <button type="button" className="btn btn-warning" onClick={()=>handleLeaveButton()}>Leave Team</button>
@@ -57,19 +59,19 @@ const Members=({team})=>{
                             <TableHeader data={["Name", "Email","Last active","Role","Action"]} />
                             <tbody>
                         {filterMembers?.map((member, index)=> {
-                            if(member.role!="LEAVE")
+                            const memberUser=member.user;
+                            if(member.role!=teamRoles.LEAVE)
                                 return (
                                     <tr key={index}>
                                         <td>
-                                            <Avatar src={member.u.urlIcon}/>
-                                            {member.u.nickName}
+                                            <Avatar src={memberUser.urlIcon}/> {memberUser.nickName}
                                         </td>
-                                        <td>{member.u.email}</td>
-                                        <td>{getDateTime(member.u.lastActive)}</td>
+                                        <td>{memberUser.email}</td>
+                                        <td>{getDateTime(memberUser.lastActive)}</td>
                                         <td>{member.role}</td>
                                         <td>
-                                            {(roleOfUser.role=="LEADER")&&member.u.id===user.id&&
-                                            <button type="button" className="btn btn-danger" onClick={(e)=>handleKickButton(e,member.u.id)}>Kick member</button>}
+                                            {(roleOfUser.role==teamRoles.LEADER)&&
+                                            <button type="button" className="btn btn-danger" onClick={(e)=>handleKickButton(e,memberUser.id)}>Kick member</button>}
                                         </td>
                                     </tr>
                                 )

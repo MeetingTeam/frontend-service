@@ -11,13 +11,13 @@ import { loadMoreTeams } from "../../Redux/teamsReducer.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 
 const TeamsPage=()=>{
-            const dispatch= useDispatch();
+           const dispatch= useDispatch();
           const teams=useSelector(state=>state.teams);
           const [channelInfo, setChannelInfo]=useState({teamIndex:0, channelIndex:0});
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
           const [showTeamModal, setShowTeamModal]=useState(false);
-           const { showErrorMessage } = useSnackbarUtil();
+          const { showErrorMessage } = useSnackbarUtil();
 
           const handleFilter = (item) => {
                     const re = new RegExp("^"+search,"i");
@@ -35,6 +35,7 @@ const TeamsPage=()=>{
             })
             .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
+
           let team=null;
           let channel=null;
           if(teams&&teams.length>0){
@@ -80,7 +81,7 @@ const TeamsPage=()=>{
                                         <button className="mt-1 w-100 btn btn-outline-success" onClick={()=>handleShowMoreBtn()}>Show More</button>
                                     </div>
                                 </div>
-                                {team&&<TeamChat team={team} channel={channel} channelInfo={channelInfo}/>}
+                                {team&&<TeamChat team={team} channel={channel} channelInfo={channelInfo} setChannelInfo={setChannelInfo}/>}
                             </div>
                         </div>
                     </div>

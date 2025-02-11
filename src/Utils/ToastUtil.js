@@ -14,6 +14,6 @@ export function alertError(message){
 
 export function alertInfo(message){
           toast.info(message, {
-                    position: "top-right"
+                    position: "bottom-center"
           });
 }

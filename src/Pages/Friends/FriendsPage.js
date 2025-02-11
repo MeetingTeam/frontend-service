@@ -15,9 +15,8 @@ const FriendsPage=()=>{
           const friends=useSelector(state=>state.friends);
           const [indexChatFriend, setIndexChatFriend]=useState(0);
           const [searchTerm, setSearchTerm]=useState("");
-          const [search, setSearch]=useState("")
-
-          
+          const [searchFriendIds, setSearchFriendIds]=useState(null);
+  
           function handleFriendChat(e,friendId){
                 e.preventDefault();
                 setIndexChatFriend(friends.findIndex((friend)=>friend.id==friendId))
@@ -28,13 +27,28 @@ const FriendsPage=()=>{
             })
             .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
-          const handleFilter = (item) => {
-            const re = new RegExp("^"+search,"i");
-            return item.nickName.match(re);
+        function handleSearchBtn(e){
+            e.preventDefault();
+            if(searchTerm&&searchTerm!="") {
+                FriendAPI.searchFriendsByName(searchTerm).then(res=>{
+                    var searchFriends=res.data;
+                    setSearchFriendIds(new Set(searchFriends.map(searchFriend=>searchFriend.id)));
+                    dispatch(loadMoreFriends(searchFriends));
+                })
+                .catch(err=>showErrorMessage(handleAxiosError(err)));
+            }
+            else if(searchFriendIds!=null) setSearchFriendIds(null);
+        }
+        function handleFilter(){
+            if(!friends) return null;
+            if(searchFriendIds!=null){
+                return friends.filter(friend=>searchFriendIds.has(friend.id));
+            }
+            else return friends;
         }
         
-        const chatFriend=(friends&&friends.length>0)?friends[indexChatFriend]:null;
-        let filterFriends=(search==="")?friends:friends.filter(handleFilter);
+        const filterFriends=handleFilter();
+        const chatFriend=(filterFriends&&filterFriends.length>0)?filterFriends[indexChatFriend]:null;
           return(
                 <div className="container-fluid">
                     <div className="row clearfix">
@@ -43,7 +57,7 @@ const FriendsPage=()=>{
                                 {/* people lists*/ }
                                 <div id="plist" className="friends-management">
                                     <div className="friends-control">
-                                        <form className="input-group" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
+                                        <form className="input-group" onSubmit={e=>handleSearchBtn(e)}>
                                                 <span className="input-group-text"><i className="fa fa-search"></i></span>
                                                 <input type="text" className="form-control" placeholder="Search..." onChange={(e)=>setSearchTerm(e.target.value)}/>
                                         </form>

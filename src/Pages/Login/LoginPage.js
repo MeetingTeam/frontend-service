@@ -86,7 +86,7 @@ const LoginPage=()=>{
                                 <button className="btn btn-primary btn-login text-uppercase fw-bold" onClick={()=>onSubmit()}>Sign in</button>
                               </div>
                               </div>
-                                  <div className="ContentAlignment">
+                                  <div className="contentAlignment">
                                         <Link to="/register">Register new account</Link>
                                         <Link to="/changePassword">Forgot password</Link>
                                   </div>

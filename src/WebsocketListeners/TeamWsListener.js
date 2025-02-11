@@ -3,7 +3,7 @@ import WebSocketService from "../Services/WebSocketService.js";
 import { wsTopics } from "../Utils/Constraints.js";
 
 export function subscribeToTeamTopics(team, dispatch){
-          const dest="/topic/team."+team.id
+          const dest="/topic/team."+team.id;
           
           WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateMessage,
                     (payload)=>{

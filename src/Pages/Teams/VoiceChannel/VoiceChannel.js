@@ -29,7 +29,7 @@ const VoiceChannel=({team, channel, channelInfo})=>{
                   })
                   .catch(err=>showErrorMessage(handleAxiosError(err)));
               }
-          },[team, channelInfo])
+          },[channelInfo])
           
           function handleScheduleButton(e){
             e.preventDefault();

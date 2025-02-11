@@ -1,8 +1,12 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { useState } from "react";
-import { updateTeam } from "../../../../old-API/TeamAPI.js";
+import MediaFileAPI from "../../../../APIs/chat-service/MediaFileAPI.js";
+import TeamAPI from "../../../../APIs/team-service/TeamAPI.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
 
 const Settings=({team})=>{
+          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
           const [teamDTO, setTeamDTO]=useState({
                     id: team.id,
                     teamName: team.teamName,
@@ -10,6 +14,7 @@ const Settings=({team})=>{
                     urlIcon: team.urlIcon
           })
           const [file, setFile]=useState(null);
+          
           async function copyToClipboard(){
                 await navigator.clipboard.writeText(team.id);
           }
@@ -23,10 +28,14 @@ const Settings=({team})=>{
           }
           function handleSubmitButton(e){
                     e.preventDefault();
-                    updateTeam(teamDTO, file).then(res=>{
-                        alert("Update team successfully")
+                    MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
+                        const dto= {...teamDTO};
+                        dto.urlIcon=fileUrl;
+                        TeamAPI.updateTeam(dto).then(res=>{
+                            showSuccessMessage("Update team successfully");
+                        })
+                        .catch(err=>showErrorMessage(handleAxiosError(err)));
                     })
-                    .catch(err=>alert('There was an error'));
           }
           return(
                   <Form>

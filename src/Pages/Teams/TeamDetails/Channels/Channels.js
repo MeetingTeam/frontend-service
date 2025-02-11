@@ -11,7 +11,7 @@ const Channels=({team})=>{
           const user=useSelector(state=>state.user);
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
-          const roleOfUser=team.members.filter(member=>member.u.id==user.id)[0].role;
+          const roleOfUser=team.members.filter(member=>member.user.id==user.id)[0].role;
           const [updatedChannel, setUpdatedChannel]=useState(null)
           const handleFilter = (item) => {
                     const re = new RegExp("^"+search,"i");

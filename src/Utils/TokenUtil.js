@@ -6,7 +6,6 @@ export async function getAccessToken() {
                     return "Bearer "+session.getAccessToken().getJwtToken();
           }
           catch(err){
-                    console.log("err", err);
                     return "";
           }
 }

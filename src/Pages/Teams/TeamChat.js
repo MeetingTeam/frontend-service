@@ -9,8 +9,9 @@ import { channelTypes } from "../../Utils/Constraints.js";
 import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { addMembers } from "../../Redux/teamsReducer.js";
 import VoiceChannel from "./VoiceChannel/VoiceChannel.js";
+import TeamDetails from "./TeamDetails/TeamDetails.js";
 
-const TeamChat=({team, channel,channelInfo})=>{
+const TeamChat=({team, channel,channelInfo, setChannelInfo})=>{
           const dispatch=useDispatch();
           const { showErrorMessage } = useSnackbarUtil();
 
@@ -46,8 +47,8 @@ const TeamChat=({team, channel,channelInfo})=>{
                               <TextChannel team={team} channel={channel} channelInfo={channelInfo}/>}
                     {channel&&channel.type==channelTypes.VOICE_CHANNEL&&
                               <VoiceChannel team={team} channel={channel} channelInfo={channelInfo}/>}
-                    {/* {team.members&&channel==null&&
-                              <TeamDetails team={team} channelInfo={channelInfo} setChannelInfo={setChannelInfo}/>} */}
+                    {team.members&&channel==null&&
+                              <TeamDetails team={team} channelInfo={channelInfo} setChannelInfo={setChannelInfo}/>}
           </div>
          )
 }

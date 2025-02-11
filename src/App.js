@@ -9,11 +9,13 @@ import { amplifyConfig } from './Configs/AmplifyConfig.js';
 import { Amplify } from 'aws-amplify';
 import ProtectedRouter from './Routers/ProtectedRouter.js';
 import ClientRouter from './Routers/ClientRouter.js';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   Amplify.configure(amplifyConfig);
   return (
         <BrowserRouter>
+            <ToastContainer/>
             <SnackbarProvider maxSnack={3}>
                   <Routes>
                       <Route path="/login" element={<LoginPage/>}/>

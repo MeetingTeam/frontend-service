@@ -36,7 +36,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                             messages: res.data}))
                     })
                 }
-            },[team, channelInfo])
+            },[channelInfo])
             
             function submitMessage(e){
                 e.preventDefault();
@@ -70,12 +70,12 @@ const TextChannel=({team, channel, channelInfo})=>{
                         showErrorMessage("File too big");
                         return;
                     }
-                    MediaFileAPI.uploadFileToS3(file).then(presignedUrl=>{
+                    MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
                                   const fileMessage={
                                       teamId: team.id,
                                       channelId: channel.id,
                                       mediaFile: {
-                                          fileUrl: presignedUrl,
+                                          fileUrl: fileUrl,
                                           fileType: file.type,
                                           fileSizeInBytes: file.size
                                       }

@@ -12,11 +12,11 @@ class TeamRequestAPI {
         return AxiosService.post(`${teamRequestEndpoint}/accept`, acceptDto);
     }
 
-    getTeamRequestMessages(teamId) {
+    getTeamRequests(teamId) {
         return AxiosService.get(`${teamRequestEndpoint}/team/${teamId}`);
     }
 
-    getSendedRequestMessages() {
+    getSendedRequests() {
         return AxiosService.get(teamRequestEndpoint);
     }
 

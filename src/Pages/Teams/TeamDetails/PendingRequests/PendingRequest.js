@@ -1,40 +1,41 @@
 import { useEffect, useState } from "react";
-import { acceptNewMember, deleteTeamRequest, getTeamRequestMessages } from "../../../../old-API/TeamRequestAPI.js";
-import { useSelector } from "react-redux";
 import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
 import Avatar from "../../../../Components/Avatar/Avartar.js";
+import TeamRequestAPI from "../../../../APIs/team-service/TeamRequestAPI.js";
 
 const PendingRequest=({team})=>{
           const [requests, setRequests]=useState([]);
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
+          
           useEffect(()=>{
-                    getTeamRequestMessages(team.id).then(res=>{
-                              setRequests(res.data);
+            TeamRequestAPI.getTeamRequests(team.id).then(res=>{
+                        setRequests(res.data);
                     })
           },[])
           const handleFilter = (item) => {
                     const re = new RegExp("^"+search,"i");
-                    return item.u.nickName.match(re);
+                    return item.user.nickName.match(re);
             }
           function handleAcceptButton(e, requestId){
                     e.preventDefault();
-                    acceptNewMember(team.id,requestId).then(res=>{
+                    TeamRequestAPI.acceptNewMember(team.id,requestId).then(res=>{
                             setRequests(prev=>prev.filter(request=>request.id!=requestId))
                     });
           }
           function handleDeleteButton(e, requestId){
                     e.preventDefault();
-                    deleteTeamRequest(requestId).then(res=>{
+                    TeamRequestAPI.deleteTeamRequest(requestId).then(res=>{
                               setRequests(prev=>{
                                         return prev.filter(request=>request.id!=requestId);
                               })
                     })
           }
+
           let filterRequests=(search==="")?requests:requests.filter(handleFilter);
           return(
           <div className="tablePage">
-                    <div className="ContentAlignment" style={{marginBottom:"10px"}}>
+                    <div className="ContentAlignment mb-10">
                               <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
                                         <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
                                         <button className="btn btn-outline-success" type="submit" >Search</button>

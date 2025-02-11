@@ -26,7 +26,6 @@ const FriendChat=({friend, indexChatFriend})=>{
           const [replyMessage, setReplyMessage]=useState(null);
           const [reactions, setReactions]=useState(null);
           const [showUnfriend, setShowUnfriend]=useState(false);
-          const target = useRef(null);
           
           useEffect(()=>{
                 if(!friend.messages){
@@ -35,7 +34,7 @@ const FriendChat=({friend, indexChatFriend})=>{
                     })
                     .catch(err=>showErrorMessage(handleAxiosError(err)));
                 }
-          },[])
+          },[friend])
           
           function submitMessage(e){
                 e.preventDefault();
@@ -54,8 +53,8 @@ const FriendChat=({friend, indexChatFriend})=>{
           }
           function handleAddMessagesButton(e){
                e.preventDefault();
-               let limit=friend.messages?friend.messages.length:0;
-               MessageAPI.getPrivateMessages(limit, friend.id).then(res=>{
+               let messagesNum=friend.messages?friend.messages.length:0;
+               MessageAPI.getPrivateMessages(messagesNum, friend.id).then(res=>{
                         dispatch(loadMoreMessages({
                             messages: res.data, 
                             friendIndex: indexChatFriend
@@ -73,11 +72,11 @@ const FriendChat=({friend, indexChatFriend})=>{
                     showErrorMessage("File too big");
                     return;
                 }
-                MediaFileAPI.uploadFileToS3(file).then(presignedUrl=>{
+                MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
                         const fileMessage={
                             recipientId: friend.id,
                             mediaFile: {
-                                fileUrl: presignedUrl,
+                                fileUrl: fileUrl,
                                 fileType: file.type,
                                 fileSizeInBytes: file.size
                             }

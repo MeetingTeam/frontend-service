@@ -2,7 +2,7 @@
   color: red;
   font-style: italic;
 }
-.ContentAlignment{
+.contentAlignment{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -14,11 +14,6 @@
   justify-content: center;
   align-items: center;
   margin-top:"20%"
-}
-.avatar{
-  border-radius: 40px;
-  width: 40px;
-  height: 40px;
 }
 .btn-circle {
   width: 50px;
