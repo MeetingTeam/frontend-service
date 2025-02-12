@@ -15,6 +15,12 @@ const TeamChat=({team, channel,channelInfo, setChannelInfo})=>{
           const dispatch=useDispatch();
           const { showErrorMessage } = useSnackbarUtil();
 
+          function handle3DotButton(e){
+                e.preventDefault();
+                setChannelInfo(prev=>{
+                    return {teamIndex: prev.teamIndex,channelIndex:-1, tabIndex:0};
+                })
+         }
           useEffect(()=>{
                     if(!team.members){
                               TeamMemberAPI.getMembersOfTeam(team.id).then(res=>{

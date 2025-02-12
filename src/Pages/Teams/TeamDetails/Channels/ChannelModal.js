@@ -1,33 +1,36 @@
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import ChannelAPI from "../../../../APIs/team-service/ChannelAPI.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
-import { useSnackbarUtil } from "../../../../Utils/SnackbarUtil.js";
+import { alertError, alertSuccess } from "../../../../Utils/ToastUtil.js";
+import { useState } from "react";
 
-const  ChannelModal=({channel,setChannel})=>{
-        const { showErrorMessage, showSuccessMessage } = useSnackbarUtil();
-          
+const  ChannelModal=({channel, setShow})=>{
+        const [channelDTO, setChannelDTO]= useState({...channel})
+        
         function handleOnChange(e, fieldName){
-                  channel[fieldName]=e.target.value;
-          }
-          function handleSubmit(e){
+                const updatedDto={...channelDTO};
+                updatedDto[fieldName]=e.target.value;
+                setChannelDTO(updatedDto);
+        }
+        function handleSubmit(e){
                   e.preventDefault();
                   if(!channel.id){
-                        ChannelAPI.createChannel(channel).then(res=>{
-                                setChannel(null);
-                                showSuccessMessage("Create channel successfully");
+                        ChannelAPI.createChannel(channelDTO).then(res=>{
+                                setShow(0);
+                                alertSuccess("Create channel successfully");
                         })
-                        .catch(err=>showErrorMessage(handleAxiosError(err)));
+                        .catch(err=>alertError(handleAxiosError(err)));
                   }
                   else {
-                        ChannelAPI.updateChannel(channel).then(res=>{
-                                setChannel(null);
-                                showSuccessMessage("Update channel successfully");
+                        ChannelAPI.updateChannel(channelDTO).then(res=>{
+                                setShow(0);
+                                alertSuccess("Update channel successfully");
                         })
-                        .catch(err=>showErrorMessage(handleAxiosError(err)));
+                        .catch(err=>alertError(handleAxiosError(err)));
                   }
           }
           return(
-                  <Modal show={true} onHide={()=>setChannel(null)}>
+                  <Modal show={true} onHide={()=>setShow(0)}>
                               <Modal.Header closeButton>
                                       <Modal.Title>Add or update channel</Modal.Title>
                               </Modal.Header>

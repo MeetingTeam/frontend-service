@@ -8,13 +8,14 @@ import { useSelector } from "react-redux";
 import { tabTitles, teamRoles } from "../../../Utils/Constraints.js";
 
 const TeamDetails=({team, channelInfo, setChannelInfo})=>{
-            console.log("members", team.members);
             const user=useSelector(state=>state.user);
-           let roleOfUser=team.members.filter(member=>member.user.id==user.id)[0].role;
+            const roleOfOwner=team.members.find(member=>member.user.id==user.id)?.role;
+
            function handleTabClick(tabIndex){
                 setChannelInfo({...channelInfo, tabIndex:tabIndex});
            }
-          return(
+          
+           return(
                 <>
                     <div className="chat-header clearfix">
                         <div className="row">
@@ -30,7 +31,7 @@ const TeamDetails=({team, channelInfo, setChannelInfo})=>{
                     </div>
                     <div className="chat-history">
                             {channelInfo.tabIndex==0&&<Members team={team}/>}
-                            {channelInfo.tabIndex==1&&(roleOfUser==teamRoles.LEADER)
+                            {channelInfo.tabIndex==1&&(roleOfOwner==teamRoles.LEADER)
                                 &&<PendingRequest team={team}/>}
                             {channelInfo.tabIndex==2&&<Channels team={team}/>}
                             {channelInfo.tabIndex==3&&<Settings team={team}/>}

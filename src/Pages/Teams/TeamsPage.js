@@ -23,12 +23,6 @@ const TeamsPage=()=>{
                     const re = new RegExp("^"+search,"i");
                     return item.teamName.match(re);
           }
-          function handle3DotButton(e){
-            e.preventDefault();
-            setChannelInfo(prev=>{
-                return {teamIndex: prev.teamIndex,channelIndex:-1, tabIndex:0};
-            })
-          }
           function handleShowMoreBtn(){
             TeamAPI.getJoinedTeams(teams.length/10, 10).then(res=>{
                 dispatch(loadMoreTeams(res.data.data));

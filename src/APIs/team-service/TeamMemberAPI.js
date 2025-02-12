@@ -13,8 +13,10 @@ class TeamMemberAPI {
     }
 
     kickMember(teamId, memberId) {
+        console.log("kickMmeber", teamId, memberId);
         return AxiosService.delete(`${teamMemberEndpoint}/kick-member`, {
-            params: { teamId, memberId }
+            teamId: teamId, 
+            memberId: memberId
         });
     }
 

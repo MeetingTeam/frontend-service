@@ -1,26 +1,20 @@
 import { Button, Col, Form, Modal, Row } from "react-bootstrap"
-import { sendFriendRequest } from "../../../../old-API/FriendRequestAPI.js";
-import { enqueueSnackbar, useSnackbar } from "notistack";
 import { useState } from "react";
+import { alertError, alertSuccess } from "../../../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import FriendRequestAPI from "../../../../APIs/user-service/FriendRequestAPI.js";
 
 export const AddFriendModal=({setShow})=>{
         const [email, setEmail]=useState("");
         const [content, setContent]=useState("");
-        const { enqueueSnackbar }=useSnackbar();
-        function handleRequestButton(e){
-                e.preventDefault();
-                sendFriendRequest(email, content).then(res=>{
-                        let config = {variant: 'success',anchorOrigin:{ horizontal: 'center' , vertical: 'bottom'}};
-                        enqueueSnackbar("Send friend request successfully", config);
+        function handleRequestButton(){
+                FriendRequestAPI.createFriendRequest({email, content}).then(res=>{
                         setShow(false);
+                        alertSuccess("Send friend request successfully");
                 })
-                .catch(err=>{
-                        let config = {variant: 'error',anchorOrigin:{ horizontal: 'center' , vertical: 'bottom'}};
-                        const errorPayload=err.response
-                        if(errorPayload.status==400) enqueueSnackbar(errorPayload.data, config);
-                        else enqueueSnackbar("Sending request failed! There was an unexpected error", config)
-                })
-        }       
+                .catch(err=>alertError(handleAxiosError(err)));
+        }   
+
           return(
           <Modal show={true} onHide={()=>setShow(false)}>
                     <Modal.Header closeButton>
@@ -43,7 +37,7 @@ export const AddFriendModal=({setShow})=>{
                               </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                            <Button variant="primary" onClick={(e)=>handleRequestButton(e)}>Send friend request</Button>
+                            <Button variant="primary" onClick={()=>handleRequestButton()}>Send friend request</Button>
                     </Modal.Footer>
           </Modal>
           )

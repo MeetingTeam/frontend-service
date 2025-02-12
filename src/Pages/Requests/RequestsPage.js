@@ -2,10 +2,12 @@ import { useState } from "react"
 import FriendRequests from "./FriendRequests/FriendRequests.js"
 import "./RequestsPage.css"
 import TeamRequests from "./TeamRequests/TeamRequests.js"
+
 const RequestsPage=()=>{
-            const tabTitles=["Friend Requests","Team Requests"]
-            const [tab, setTab]=useState("Friend Requests")
-          return(
+        const tabTitles=["Friend Requests","Team Requests"]
+        const [tab, setTab]=useState("Friend Requests")
+        
+        return(
           <div className="container">
                     <div className="row clearfix">
                         <div className="col-lg-12">

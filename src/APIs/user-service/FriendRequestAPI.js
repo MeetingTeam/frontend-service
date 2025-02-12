@@ -23,7 +23,7 @@ class FriendRequestAPI {
     }
 
     getSentRequests() {
-        return AxiosService.get(`${FRIEND_REQUEST_ENDPOINT}/sent-requests`);
+        return AxiosService.get(`${friendRequestEndpoint}/sent-requests`);
     }
 }
 

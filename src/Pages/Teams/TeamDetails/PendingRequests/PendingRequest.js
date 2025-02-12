@@ -35,10 +35,10 @@ const PendingRequest=({team})=>{
           let filterRequests=(search==="")?requests:requests.filter(handleFilter);
           return(
           <div className="tablePage">
-                    <div className="ContentAlignment mb-10">
+                    <div className="contentAlignment mb-2">
                               <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
-                                        <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
-                                        <button className="btn btn-outline-success" type="submit" >Search</button>
+                                    <span className="input-group-text"><i className="fa fa-search"></i></span>
+                                    <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
                               </form>
                     </div>
                     <div className="TableWapper border-bottom border-dark">

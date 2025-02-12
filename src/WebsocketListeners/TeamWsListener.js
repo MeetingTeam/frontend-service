@@ -1,4 +1,4 @@
-import { addChannel, addMeeting, addMembers, addTeamChatMessage, deleteMeeting, removeChannel, updateTeam } from "../Redux/teamsReducer.js";
+import { addChannel, addMeeting, addMembers, addTeamChatMessage, deleteMeeting, deleteMember, removeChannel, updateTeam } from "../Redux/teamsReducer.js";
 import WebSocketService from "../Services/WebSocketService.js";
 import { wsTopics } from "../Utils/Constraints.js";
 
@@ -16,6 +16,13 @@ export function subscribeToTeamTopics(team, dispatch){
                         const members=payload;
                         dispatch(addMembers({teamId: team.id, newMembers: members}))
                     });
+
+            WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteMember,
+                  (payload)=>{
+                        const memberId=payload;
+                        dispatch(deleteMember({teamId: team.id, memberId}));
+                  }
+            )
           
           WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateChannel,
                     (payload)=>{
@@ -31,7 +38,7 @@ export function subscribeToTeamTopics(team, dispatch){
           
           WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateTeam,
                 (payload)=>{
-                        const updatedTeam=JSON.parse(payload.body);
+                        const updatedTeam=payload;
                         dispatch(updateTeam(updatedTeam));
                       });
                       

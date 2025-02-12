@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { requestToJoinAteam } from "../../../old-API/TeamRequestAPI.js";
+import TeamRequestAPI from "../../../APIs/team-service/TeamRequestAPI.js";
+import { alertError, alertSuccess } from "../../../Utils/ToastUtil.js";
 
 const JoinRequestModal=({setShow})=>{
           const [teamId, setTeamId]=useState("");
           const [content, setContent]=useState("");
           function handleSubmit(e){
                   e.preventDefault();
-                  requestToJoinAteam({
-                          team: {id: teamId},
-                          content: content,
-                          createdAt: new Date()
+                  TeamRequestAPI.createTeamRequest({
+                        teamId: team.id,
+                        content: content
                   }).then(res=>{
-                        alert(res.data);
+                        alertSuccess(res.data);
                         setShow(false);
                 })
-                  .catch(err=>alert("There is an error when sending request"))
+                .catch(err=>alertError("There is an error when sending request"))
           }
           return(
                   <Modal show={true} onHide={()=>setShow(false)}>

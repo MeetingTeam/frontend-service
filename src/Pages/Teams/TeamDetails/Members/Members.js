@@ -10,16 +10,16 @@ import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 import { teamRoles } from "../../../../Utils/Constraints.js";
 import WebSocketService from "../../../../Services/WebSocketService.js";
 import { getDateTime } from "../../../../Utils/DateTimeUtil.js";
+import { alertError, alertSuccess } from "../../../../Utils/ToastUtil.js";
 
 const Members=({team})=>{
           const user=useSelector(state=>state.user);
           const members=team.members;
-          const roleOfUser=team.members.filter(member=>member.user.id===user.id)[0].role;
+          const roleOfOwner=team.members.find(member=>member.user.id==user.id)?.role;
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
           const [showFriendsList, setShowFriendsList]=useState(false);
           const dispatch= useDispatch();
-          const { showErrorMessage, showSuccessMessage } = useSnackbarUtil();
          
           const filterMembers=(search==="")?members:members.filter(handleFilter);
           
@@ -27,31 +27,31 @@ const Members=({team})=>{
             const re = new RegExp("^"+search,"i");
             return item.user.nickName.match(re);
          }
-          function handleKickButton(e,memberId){
-                e.preventDefault();
+          function handleKickButton(memberId){
                 TeamMemberAPI.kickMember(team.id, memberId).then(res=>{
-                    showSuccessMessage('Kick member successfully');
+                    alertSuccess('Kick member successfully')
                 })
-                .catch(err=>showErrorMessage(handleAxiosError(err)));
+                .catch(err=>alertError(handleAxiosError(err)));
           }
           function handleLeaveButton(){
                 TeamMemberAPI.leaveTeam(team.id).then(()=>{
                     WebSocketService.unsubscribeByTeamId(team.id);
                     dispatch(deleteTeam(team.id));
-                    showSuccessMessage("You have leaved the team "+team.teamName);
-                });
+                    alertSuccess("You have leaved the team "+team.teamName);
+                })
+                .catch(err=>alertError("Failed to leave team. Try again"));
           }
 
           return(
             <>
-            {showFriendsList&&<FriendsListModal team={team} setShow={setShowFriendsList}/>}
+            {showFriendsList&&<FriendsListModal user={user} team={team} setShow={setShowFriendsList}/>}
             <div className="tablePage">
-                    <div className="ContentAlignment" style={{marginBottom:"10px"}}>
-                              <button type="button" className="btn btn-primary" onClick={()=>setShowFriendsList(true)}>Add new member</button>
-                              <button type="button" className="btn btn-warning" onClick={()=>handleLeaveButton()}>Leave Team</button>
+                    <div className="contentAlignment mb-2">
+                              <button type="button" className="btn btn-sm btn-primary" onClick={()=>setShowFriendsList(true)}>Add new member</button>
+                              <button type="button" className="btn btn-sm btn-warning" onClick={()=>handleLeaveButton()}>Leave Team</button>
                               <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
-                                        <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
-                                        <button className="btn btn-outline-success" type="submit" >Search</button>
+                                    <span className="input-group-text"><i className="fa fa-search"></i></span>
+                                    <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
                               </form>
                     </div>
                     <div className="TableWapper border-bottom border-dark">
@@ -70,8 +70,8 @@ const Members=({team})=>{
                                         <td>{getDateTime(memberUser.lastActive)}</td>
                                         <td>{member.role}</td>
                                         <td>
-                                            {(roleOfUser.role==teamRoles.LEADER)&&
-                                            <button type="button" className="btn btn-danger" onClick={(e)=>handleKickButton(e,memberUser.id)}>Kick member</button>}
+                                            {(roleOfOwner==teamRoles.LEADER&&memberUser.id!=user.id)&&
+                                            <button type="button" className="btn btn-sm btn-danger" onClick={(e)=>handleKickButton(memberUser.id)}>Kick member</button>}
                                         </td>
                                     </tr>
                                 )

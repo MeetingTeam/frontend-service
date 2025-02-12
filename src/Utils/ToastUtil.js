@@ -1,19 +1,17 @@
 import { toast } from "react-toastify";
 
+const toastConfig={
+          position: "bottom-center",
+          className: "toast-message"
+}
 export function alertSuccess(message){
-          toast.success(message, {
-                    position: "top-right"
-          });
+          toast.success(message, toastConfig);
 }
 
 export function alertError(message){
-          toast.error(message, {
-                    position: "top-right"
-          });
+          toast.error(message, toastConfig);
 }
 
 export function alertInfo(message){
-          toast.info(message, {
-                    position: "bottom-center"
-          });
+          toast.info(message, toastConfig);
 }

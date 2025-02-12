@@ -1,33 +1,38 @@
 import { useEffect, useState } from "react";
-import { deleteTeamRequest, getSendedRequestMessages, getTeamRequestMessages } from "../../../old-API/TeamRequestAPI.js";
 import Avatar from "../../../Components/Avatar/Avartar.js";
-import JoinRequestModal from "./JoinReuqestModal.js";
+import JoinRequestModal from "./JoinRequestModal.js";
 import TableHeader from "../../../Components/TableHeader/TableHeader.js";
-import { getTimeDistance } from "../../../Util/DateTimeUtil.js";
+import TeamRequestAPI from "../../../APIs/team-service/TeamRequestAPI.js";
+import { alertError } from "../../../Utils/ToastUtil.js";
+import { getTimeDistance } from "../../../Utils/DateTimeUtil.js";
 
 const TeamRequests=()=>{
           const [requests, setRequests]=useState([]);
           const [showJoinRequestModal, setShowJoinRequestModal]=useState(false);
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
+          
           useEffect(()=>{
-                    getSendedRequestMessages().then(res=>{
+                TeamRequestAPI.getSendedRequests().then(res=>{
                               setRequests(res.data);
-                    })
+                })
+                .catch(err=>alertError("Unable to fetch team reuqests.Please try again"));
           },[])
-          function handleUnsendButton(e, requestId){
-                    e.preventDefault();
-                    deleteTeamRequest(requestId).then(res=>{
+          
+          function handleUnsendButton(requestId){
+                TeamRequestAPI.deleteTeamRequest(requestId).then(res=>{
                               setRequests(prev=>prev.filter(request=>request.id!=requestId));
-                    })
+                })
+                .catch(err=>alertError('Failed to delete request'));
           }
           const handleFilter = (item) => {
                     const re = new RegExp("^"+search,"i");
                     return item.team.teamName.match(re);
           }
+
           const filterRequests=(search==="")?requests:requests.filter(handleFilter);
           return(
-          <>
+                <>
                     {showJoinRequestModal&&<JoinRequestModal setShow={setShowJoinRequestModal} />}
                     <div className="chat">
                     <div className="chat-header clearfix">
@@ -63,7 +68,7 @@ const TeamRequests=()=>{
                                                   <td>{request.content}</td>
                                                   <td>{getTimeDistance(request.createdAt)}</td>
                                                   <td>
-                                                            <button type="button" className="btn btn-danger" onClick={(e)=>handleUnsendButton(e,request.id)}>Unsend</button>
+                                                            <button type="button" className="btn btn-danger" onClick={()=>handleUnsendButton(request.id)}>Unsend</button>
                                                   </td>
                                         </tr>
                                         )

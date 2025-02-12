@@ -2,51 +2,55 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import ChannelModal from "./ChannelModal.js";
 import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
-import { channelTypes } from "../../../../Utils/Constraints.js";
+import { channelTypes, teamRoles } from "../../../../Utils/Constraints.js";
 import ChannelAPI from "../../../../APIs/team-service/ChannelAPI.js";
 import { alertError } from "../../../../Utils/ToastUtil.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
+import DeleteChannelModal from "./DeleteChannelModal.js";
 
 const Channels=({team})=>{
           const user=useSelector(state=>state.user);
           const [searchTerm, setSearchTerm]=useState("");
           const [search, setSearch]=useState("");
           const roleOfUser=team.members.filter(member=>member.user.id==user.id)[0].role;
-          const [updatedChannel, setUpdatedChannel]=useState(null)
-          const handleFilter = (item) => {
+
+          const [choosedChannel, setChoosedChannel]=useState(null);
+          const [showModal, setShowModal]=useState(0);
+          
+          function handleFilter(item) {
                     const re = new RegExp("^"+search,"i");
                     return item.channelName.match(re);
             }
           function handleAddButton(e){
-                    e.preventDefault();
-                    setUpdatedChannel({
+                    setChoosedChannel({
                               teamId: team.id,
                               channelName:"",
                               type: channelTypes.CHAT_CHANNEL,
                               description:""
-                    })                
+                    });
+                    setShowModal(1);              
           }
-          function handleUpdateButton(e, channelId){
-                    e.preventDefault();
-                    const channel={...team.channels.filter(channel=>channel.id==channelId)[0]};
-                    channel.teamId=team.id;
-                    setUpdatedChannel(channel);
+          function handleUpdateButton(channel){
+                    setChoosedChannel(channel);
+                    setShowModal(1);
           }
-          function handleDeleteButton(e,channelId){
-                    e.preventDefault();
-                    ChannelAPI.deleteChannel(channelId)
-                        .catch(err=>alertError(handleAxiosError(err)));
+          function handleDeleteButton(channel){
+                setChoosedChannel(channel);
+                setShowModal(2);
           }
+
           const filterChannels=(search=="")?team.channels:team.channels.filter(handleFilter)
           return(
           <>
-          {updatedChannel&&<ChannelModal channel={updatedChannel} setChannel={setUpdatedChannel}/>}
+          {showModal==1&&<ChannelModal channel={choosedChannel} setShow={setShowModal}/>}
+          {showModal==2&&<DeleteChannelModal channel={choosedChannel} setShow={setShowModal} />}
           <div className="tablePage">
-                    <div className="ContentAlignment" style={{marginBottom:"10px"}}>
-                              {(roleOfUser=="LEADER"||roleOfUser=="DEPUTY")&&<button type="button" className="btn btn-secondary" onClick={(e)=>handleAddButton(e)}>Add new channel</button>}
-                              <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
-                                        <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
-                                        <button className="btn btn-outline-success" type="submit" >Search</button>
+                    <div className="contentAlignment mb-2">
+                              {(roleOfUser==teamRoles.LEADER)&&
+                                <button type="button" className="btn btn-sm btn-secondary" onClick={(e)=>handleAddButton(e)}>Add new channel</button>}
+                                <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
+                                    <span className="input-group-text"><i className="fa fa-search"></i></span>
+                                    <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
                               </form>
                     </div>
                     <div className="TableWapper border-bottom border-dark">
@@ -60,10 +64,10 @@ const Channels=({team})=>{
                                         <td>{channel.description}</td>
                                         <td>{channel.type}</td>
                                         <td>
-                                            {(roleOfUser=="LEADER"||roleOfUser=="DEPUTY")&&
+                                            {(roleOfUser==teamRoles.LEADER)&&
                                             <>
-                                            <button type="button" className="btn btn-primary" onClick={(e)=>handleUpdateButton(e,channel.id)}>Update</button>
-                                            <button type="button" className="btn btn-danger" onClick={(e)=>handleDeleteButton(e,channel.id)}>Delete</button>
+                                                <button type="button" className="btn mx-1 btn-sm btn-primary" onClick={()=>handleUpdateButton(channel)}>Update</button>
+                                                <button type="button" className="btn mx-1 btn-sm btn-danger" onClick={(e)=>handleDeleteButton(channel)}>Delete</button>
                                             </>}
                                         </td>
                                     </tr>

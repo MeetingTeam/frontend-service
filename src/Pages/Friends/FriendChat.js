@@ -51,8 +51,7 @@ const FriendChat=({friend, indexChatFriend})=>{
                         .catch(err=>showErrorMessage(handleAxiosError(err)));
                 setTextContent("");
           }
-          function handleAddMessagesButton(e){
-               e.preventDefault();
+          function handleAddMessagesButton(){
                let messagesNum=friend.messages?friend.messages.length:0;
                MessageAPI.getPrivateMessages(messagesNum, friend.id).then(res=>{
                         dispatch(loadMoreMessages({
@@ -111,7 +110,7 @@ const FriendChat=({friend, indexChatFriend})=>{
                             </div>
                         </div>
                     <div className="chat-history">
-                        <button className="btn btn-success" onClick={(e)=>handleAddMessagesButton(e)}>See more messages</button>
+                        <button className="btn btn-success" onClick={handleAddMessagesButton}>See more messages</button>
                         <ul className="m-b-0">
                             {friend.messages&&friend.messages.map((message)=>{
                                 let parentMessage=null;

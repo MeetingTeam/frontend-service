@@ -1,14 +1,15 @@
 import { Button, Modal } from "react-bootstrap";
 import FriendAPI from "../../../APIs/user-service/FriendAPI.js";
-import { alertError } from "../../../Utils/ToastUtil.js";
+import { alertError, alertSuccess } from "../../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
 
 const UnfriendModal=({friend, setShow})=>{
 
           function handleYesBtn(){
                     FriendAPI.unfriend(friend.id).then(res=>{
-                              alertError("Unfriend successfully");
+                              alertSuccess("Unfriend successfully");
                               setShow(false);
-                    }).catch(err=>showSnackbar(err.response.data,true));
+                    }).catch(err=>alertError(handleAxiosError(err)));
           }
           return(
                     <Modal show={true} onHide={()=>setShow(false)}>

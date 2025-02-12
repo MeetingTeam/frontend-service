@@ -18,6 +18,7 @@ import { getDateTime } from "../../../Utils/DateTimeUtil.js";
 import ReactionList from "../../../Components/Message/ReactionList.js";
 import ReactionDetails from "../../../Components/Message/ReactionDetails.js";
 import EmojiPickerPopover from "../../../Components/ChatControl/EmojiPickerPopover.js";
+import { alertError } from "../../../Utils/ToastUtil.js";
 
 const TextChannel=({team, channel, channelInfo})=>{
             const dispatch=useDispatch();
@@ -53,12 +54,12 @@ const TextChannel=({team, channel, channelInfo})=>{
                 MessageAPI.sendTextMessage(textMessage).catch(err=>showErrorMessage(handleAxiosError(err)));
                 setTextContent("");
           }
-          function handleAddMessagesButton(e){
-                e.preventDefault();
-                let limit=channel.messages?channel.messages.length:0;
-                MessageAPI.getTextChannelMessages(channel.messages.length, channel.id).then(res=>{
+          function handleAddMessagesButton(){
+                let messageNum=channel.messages?channel.messages.length:0;
+                MessageAPI.getTextChannelMessages(messageNum, channel.id).then(res=>{
                     dispatch(loadMoreMessages({channelInfo: channelInfo, messages: res.data}))
                 })
+                .catch(err=>alertError("Unable to load more messages"));
           }
           function handleUpload(e){
                 const file=e.target.files[0];
@@ -96,7 +97,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                     {showVoting.type==2&&<VoteDetailModal message={showVoting.message} setShow={setShowVoting} team={team}/>}
                     {showVoting.type==3&&<CreateVoteModal teamId={team.id} nickName={user.nickName}  setShow={setShowVoting} channel={channel}/>}
                     <div className="chat-history">
-                        <button className="btn btn-success" onClick={(e)=>handleAddMessagesButton(e)}>See more messages</button>
+                        <button className="btn btn-success" onClick={handleAddMessagesButton}>See more messages</button>
                         <ul className="m-b-0">
                             {team.members&&channel.messages?.map((message)=>{
                                 let parentMessage=null;
@@ -118,7 +119,8 @@ const TextChannel=({team, channel, channelInfo})=>{
                                         return (<Voting key={message.id} message={message} setShow={setShowVoting} creatorNickName={creatorNickName}/>)
                                     }
                                     else if(message.senderId!=user.id){
-                                        const sender=team.members.find((member)=>member.u.id==message.senderId).u;
+                                        const sender = team.members.find(member => member.user.id == message.senderId)?.user;
+                                        if(sender) {
                                             return(
                                                 <li className="clearfix" key={message.id}>
                                                     <div className="message-data text-begin">
@@ -135,7 +137,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                                                                  <MessageDropdown message={message} setTextContent={setTextContent} setReplyMessage={setReplyMessage}/>
                                                         </div>
                                                     </li>  
-                                                )
+                                                )}
                                         }
                                 else return(
                                         <li className="clearfix" key={message.id}>

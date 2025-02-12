@@ -106,16 +106,29 @@ const teamsReducer=createSlice({
                     addMembers:(state, action)=>{
                               const {teamId,newMembers}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              const members={...state[teamIndex].members};
+                              const members= state[teamIndex].members;
                               if(members&&members.length){
                                         newMembers.forEach(newMember=> {
-                                                  const memberIndex=members.findIndex(member=>member.u.id==newMember.u.id);
+                                                  const memberIndex=members.findIndex(member=>member.user.id==newMember.user.id);
                                                   if(memberIndex>=0) members[memberIndex]=newMember;
                                                   else members.push(newMember);
                                         });
                                         state[teamIndex].members=members;
+                                        console.log("memebers", members);
                               }
                               else state[teamIndex].members= newMembers;
+                    },
+                    deleteMember:(state, action)=>{
+                              const {teamId, memberId}= action.payload;
+                              const teamIndex=state.findIndex(team=>team.id==teamId);
+                              if(teamIndex>-1){
+                                        const team=state[teamIndex];
+                                        if(team.members){
+                                                  state[teamIndex].members=team.members.filter(member=>member.user.id!==memberId);
+                                                  console.log("filter mebers", team.members.filter(member=>member.user.id!==memberId))
+                                        }
+                                        console.log("team delete member", state[teamIndex]);
+                              }
                     },
                     addChannel:(state, action)=>{
                               const {teamId, newChannel}=action.payload;
@@ -133,6 +146,6 @@ const teamsReducer=createSlice({
 })
 export const {loadTeams,loadMoreTeams, addTeamChatMessage, loadMoreMessages,
             loadChannelMeetings, addMeeting,deleteMeeting,
-           addMembers, addChannel, removeChannel, 
+           addMembers, deleteMember, addChannel, removeChannel, 
            updateTeam, deleteTeam} =teamsReducer.actions;
 export default teamsReducer.reducer;

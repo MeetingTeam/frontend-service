@@ -58,7 +58,8 @@ const VoiceChannel=({team, channel, channelInfo})=>{
               }).catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleAddMeetingsButton(){
-                MeetingAPI.getMeetingsOfVideoChannel(channel.id,channel.meetings.length).then(res=>{
+                const meetingsNum=channel.meetings?channel.meetings.length:0;
+                MeetingAPI.getMeetingsOfVideoChannel(channel.id,meetingsNum).then(res=>{
                     dispatch(loadChannelMeetings({channelInfo, meetings:res.data}))
                 })
                 .catch(err=>showErrorMessage(handleAxiosError(err)));
