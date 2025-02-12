@@ -45,7 +45,7 @@ const Channels=({team})=>{
           {showModal==1&&<ChannelModal channel={choosedChannel} setShow={setShowModal}/>}
           {showModal==2&&<DeleteChannelModal channel={choosedChannel} setShow={setShowModal} />}
           <div className="tablePage">
-                    <div className="contentAlignment mb-2">
+                    <div className="contentAlignment">
                               {(roleOfUser==teamRoles.LEADER)&&
                                 <button type="button" className="btn btn-sm btn-secondary" onClick={(e)=>handleAddButton(e)}>Add new channel</button>}
                                 <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>

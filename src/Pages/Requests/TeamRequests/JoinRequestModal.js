@@ -9,7 +9,7 @@ const JoinRequestModal=({setShow})=>{
           function handleSubmit(e){
                   e.preventDefault();
                   TeamRequestAPI.createTeamRequest({
-                        teamId: team.id,
+                        teamId: teamId,
                         content: content
                   }).then(res=>{
                         alertSuccess(res.data);

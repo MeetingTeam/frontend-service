@@ -4,12 +4,13 @@ import { alertError, alertSuccess } from "../../../../Utils/ToastUtil.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 import FriendRequestAPI from "../../../../APIs/user-service/FriendRequestAPI.js";
 
-export const AddFriendModal=({setShow})=>{
+export const AddFriendModal=({setShow, setNewRequest})=>{
         const [email, setEmail]=useState("");
         const [content, setContent]=useState("");
         function handleRequestButton(){
                 FriendRequestAPI.createFriendRequest({email, content}).then(res=>{
                         setShow(false);
+                        setNewRequest(res.data);
                         alertSuccess("Send friend request successfully");
                 })
                 .catch(err=>alertError(handleAxiosError(err)));

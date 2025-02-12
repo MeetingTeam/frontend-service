@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import moment from "moment";
 
 export function getTimeDistance(input) {
           if(!input) return "";
@@ -52,6 +51,12 @@ export function getScheduledTime(meeting){
 export function getDate(luxonDateTime) {
           if (!inputDate) return null;
           return luxonDateTime.toISODate();
+}
+
+export function formatBirthday(isoDateStr){
+          if(!isoDateStr) return "";
+          const luxonDateTime=DateTime.fromISO(isoDateStr);
+          return luxonDateTime.toFormat("dd-MM-yyyy");
 }
 
 export function getHourMinuteOnly(isoTimeStr){

@@ -46,7 +46,7 @@ const Members=({team})=>{
             <>
             {showFriendsList&&<FriendsListModal user={user} team={team} setShow={setShowFriendsList}/>}
             <div className="tablePage">
-                    <div className="contentAlignment mb-2">
+                    <div className="contentAlignment">
                               <button type="button" className="btn btn-sm btn-primary" onClick={()=>setShowFriendsList(true)}>Add new member</button>
                               <button type="button" className="btn btn-sm btn-warning" onClick={()=>handleLeaveButton()}>Leave Team</button>
                               <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>

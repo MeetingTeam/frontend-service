@@ -36,18 +36,14 @@ const TeamRequests=()=>{
                     {showJoinRequestModal&&<JoinRequestModal setShow={setShowJoinRequestModal} />}
                     <div className="chat">
                     <div className="chat-header clearfix">
-                        <div className="row">
-                            <div className="col-lg-6">
-                                <div className="chat-about">
-                                    <h6 className="m-b-0">Sended Team Requests</h6>
-                                    <small>{requests.length} requests</small>
-                                </div>
-                            </div>
+                        <div className="chat-about">
+                            <h6 className="m-b-0">Sended Team Requests</h6>
+                                <small>{requests.length} requests</small>
                         </div>
                     </div>
                     <div className="request-history">
-                    <div className="tablePage">
-                              <div className="ContentAlignment" style={{marginBottom:"10px"}}>
+                        <div className="tablePage">
+                            <div className="contentAlignment">
                                         <button type="button" className="btn btn-secondary" onClick={()=>setShowJoinRequestModal(true)}>Send team request</button>
                                         <form className="d-flex col-lg-6" role="search" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
                                                   <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>

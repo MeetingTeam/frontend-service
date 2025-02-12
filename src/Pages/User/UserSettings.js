@@ -4,6 +4,7 @@ import { updateUser } from "../../old-API/UserAPI.js";
 import { loadUser } from "../../Redux/userReducer.js";
 import "./User.css"
 import { useSnackbar } from "notistack";
+
 const UserSettings=()=>{
           const user=useSelector(state=>state.user);
           const dispatch=useDispatch();

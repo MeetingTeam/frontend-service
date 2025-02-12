@@ -1,7 +1,7 @@
 import { useState } from "react";
 import SendedRequests from "./SendedRequests/SendedRequests.js";
 import { Link } from "react-router-dom";
-import RecievedRequests from "./ReceivedRequests/ReceivedRequests.js";
+import ReceivedRequests from "./ReceivedRequests/ReceivedRequests.js";
 
 const FriendRequests=()=>{
           const tabTitles=["Received Requests","Sended Requests"];
@@ -22,7 +22,7 @@ const FriendRequests=()=>{
                     </div>
                     <div className="request-history">
                         {tab=="Sended Requests"&&<SendedRequests/>}
-                        {tab=="Received Requests"&&<RecievedRequests/>}
+                        {tab=="Received Requests"&&<ReceivedRequests/>}
                     </div>
                 </div>
           )
