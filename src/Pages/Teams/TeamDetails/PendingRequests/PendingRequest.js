@@ -3,6 +3,8 @@ import TableHeader from "../../../../Components/TableHeader/TableHeader.js";
 import Avatar from "../../../../Components/Avatar/Avartar.js";
 import TeamRequestAPI from "../../../../APIs/team-service/TeamRequestAPI.js";
 import UserDetailModal from "../../../../Components/UserDetail/UserDetailModal.js";
+import { alertError } from "../../../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 
 const PendingRequest=({team})=>{
           const [requests, setRequests]=useState([]);
@@ -20,19 +22,14 @@ const PendingRequest=({team})=>{
                     const re = new RegExp("^"+search,"i");
                     return item.user.nickName.match(re);
             }
-          function handleAcceptButton(e, requestId){
-                    e.preventDefault();
-                    TeamRequestAPI.acceptNewMember(team.id,requestId).then(res=>{
+          function handleApproveButton(requestId, isAccepted){
+                    TeamRequestAPI.acceptNewMember({
+                        requestId,
+                        isAccepted
+                    }).then(res=>{
                             setRequests(prev=>prev.filter(request=>request.id!=requestId))
-                    });
-          }
-          function handleDeleteButton(e, requestId){
-                    e.preventDefault();
-                    TeamRequestAPI.deleteTeamRequest(requestId).then(res=>{
-                              setRequests(prev=>{
-                                        return prev.filter(request=>request.id!=requestId);
-                              })
                     })
+                    .catch(err=>alertError(handleAxiosError(err)));
           }
           function handleUserDetailButton(user){
             setShowUserDetail({show: true, user: user});
@@ -66,8 +63,8 @@ const PendingRequest=({team})=>{
                                                 <button type="button" className="btn btn-sm btn-info" onClick={()=>handleUserDetailButton(sender)}>Info</button>                                         
                                         </td>
                                         <td>
-                                             <button type="button" className="btn btn-sm btn-primary mx-1" onClick={(e)=>handleAcceptButton(e,request.id)}>Accept</button>
-                                            <button type="button" className="btn btn-sm btn-danger mx-1" onClick={(e)=>handleDeleteButton(e,request.id)}>Delete</button>
+                                             <button type="button" className="btn btn-sm btn-primary mx-1" onClick={()=>handleApproveButton(request.id, true)}>Accept</button>
+                                            <button type="button" className="btn btn-sm btn-danger mx-1" onClick={()=>handleApproveButton(request.id, false)}>Reject</button>
                                         </td>
                                     </tr>
                                 )}

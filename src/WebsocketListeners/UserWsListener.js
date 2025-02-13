@@ -18,10 +18,16 @@ export function subscribeToUserTopics(user, dispatch){
                         dispatch(updateTeam(newTeam));
           });
           
+          WebSocketService.subscribeToNewTopic(dest, wsTopics.addOrUpdateTeam, 
+                (payload)=>{
+                    const updatedTeam=payload;
+                    dispatch(updateTeam(updatedTeam));
+                }
+          )
           WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteTeam,
                     (payload)=>{
                         const teamId=payload;
-                        unsubscribeByTeamId(teamId);
+                        WebSocketService.unsubscribeByTeamId(teamId);
                         dispatch(deleteTeam(teamId));
           });
                     

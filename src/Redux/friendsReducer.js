@@ -9,11 +9,14 @@ const friendsReducer=createSlice({
                     },
                     loadMoreFriends: (state, action)=>{
                               const addedFriends= action.payload;
-                              const stateFriendsSet= new Set(state.map(friend=>friend.id));
-                              addedFriends.forEach(addFriend=>{
-                                        if(!stateFriendsSet.has(addFriend.id))
-                                                  state.push(addFriend);
-                              })
+                              if(state){
+                                        const stateFriendsSet= new Set(state.map(friend=>friend.id));
+                                        addedFriends.forEach(addFriend=>{
+                                                  if(!stateFriendsSet.has(addFriend.id))
+                                                            state.push(addFriend);
+                                        })
+                              }
+                              else state=addedFriends;
                     },
                     addFriendChatMessage:(state,action)=>{
                               const message=action.payload;

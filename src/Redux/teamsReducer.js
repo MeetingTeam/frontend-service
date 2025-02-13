@@ -10,6 +10,8 @@ const teamsReducer=createSlice({
                     },
                     loadMoreTeams: (state, action)=>{
                               const addedTeams= action.payload;
+                              if(state==null) return addedTeams;
+
                               const stateTeamsSet= new Set(state.map(team=>team.id));
                               addedTeams.forEach(addedTeam=>{
                                         if(!stateTeamsSet.has(addedTeam.id))
@@ -89,15 +91,28 @@ const teamsReducer=createSlice({
                               if(teamIndex>-1){
                                         let team={...state[teamIndex]};
                                         let channelIndex=team.channels.findIndex(channel=>channel.id==channelId);
-                                        team.channels[channelIndex].meetings=team.channels[channelIndex].meetings.filter(meeting=>meeting.id!=meetingId);
-                                        state[teamIndex]=team;
+                                        if(channelIndex>-1){
+                                                  team.channels[channelIndex].meetings=team.channels[channelIndex].meetings.filter(meeting=>meeting.id!=meetingId);
+                                                  state[teamIndex]=team;
+                                        }
                               }
                     },
                     updateTeam:(state, action)=>{
-                              const updatedTeam=action.payload;
-                              const teamIndex=state.findIndex(team=>team.id==updatedTeam.id);
-                              if(teamIndex==-1) state.push(updatedTeam);
-                              else state[teamIndex]={...state[teamIndex], teamName:updatedTeam.teamName, urlIcon: updatedTeam.urlIcon, autoAddMember: updatedTeam.autoAddMember}
+                              const updatedTeam = action.payload;
+                              const teamIndex = state.findIndex(team => team.id === updatedTeam.id);
+                              console.log("updatedTeam", updateTeam);
+                              console.log("teamIndex", teamIndex);
+                              if (teamIndex>-1) {
+                                        state[teamIndex]={
+                                                  ...state[teamIndex], 
+                                                  teamName: updatedTeam.teamName,
+                                                  urlIcon: updatedTeam.urlIcon,
+                                                  autoAddMember: updatedTeam.autoAddMember
+                                        }
+                              } else {
+                                        if(state) state.push(updatedTeam);
+                                        else state=[updateTeam];
+                              }
                     },
                     deleteTeam:(state, action)=>{
                               const teamId=action.payload;
@@ -106,17 +121,18 @@ const teamsReducer=createSlice({
                     addMembers:(state, action)=>{
                               const {teamId,newMembers}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              const members= state[teamIndex].members;
-                              if(members&&members.length){
-                                        newMembers.forEach(newMember=> {
-                                                  const memberIndex=members.findIndex(member=>member.user.id==newMember.user.id);
-                                                  if(memberIndex>=0) members[memberIndex]=newMember;
-                                                  else members.push(newMember);
-                                        });
-                                        state[teamIndex].members=members;
-                                        console.log("memebers", members);
+                              if(teamIndex>-1){
+                                        const members= state[teamIndex].members;
+                                        if(members&&members.length>0){
+                                                  newMembers.forEach(newMember=> {
+                                                            const memberIndex=members.findIndex(member=>member.user.id==newMember.user.id);
+                                                            if(memberIndex>=0) members[memberIndex]=newMember;
+                                                            else members.push(newMember);
+                                                  });
+                                                  state[teamIndex].members=members;
+                                        }
+                                        else state[teamIndex].members= newMembers;
                               }
-                              else state[teamIndex].members= newMembers;
                     },
                     deleteMember:(state, action)=>{
                               const {teamId, memberId}= action.payload;
@@ -125,22 +141,27 @@ const teamsReducer=createSlice({
                                         const team=state[teamIndex];
                                         if(team.members){
                                                   state[teamIndex].members=team.members.filter(member=>member.user.id!==memberId);
-                                                  console.log("filter mebers", team.members.filter(member=>member.user.id!==memberId))
                                         }
-                                        console.log("team delete member", state[teamIndex]);
                               }
                     },
                     addChannel:(state, action)=>{
                               const {teamId, newChannel}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==newChannel.id);
-                              if(channelIndex>=0) state[teamIndex].channels[channelIndex]=newChannel;
-                              else state[teamIndex].channels.push(newChannel);
+                              if(teamIndex>-1){
+                                        let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==newChannel.id);
+                                        if(channelIndex>=0) state[teamIndex].channels[channelIndex]=newChannel;
+                                        else state[teamIndex].channels.push(newChannel);
+                              }
                     },
                     removeChannel:(state, action)=>{
                               const {teamId, channelId}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              state[teamIndex].channels=state[teamIndex].channels.filter(channel=>channel.id!=channelId);
+                              if(teamIndex>-1){
+                                        const channels=state[teamIndex].channels;
+                                        if(channels&&channels.length>0){
+                                                  state[teamIndex].channels=channels.filter(channel=>channel.id!=channelId);
+                                        }
+                              }
                     }
           }
 })

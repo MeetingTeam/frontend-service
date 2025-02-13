@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { Auth } from "aws-amplify";
 import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
+import { alertSuccess } from "../../Utils/ToastUtil.js";
 
 const ChangePassword=()=>{
           const navigate = useNavigate();
-          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
           const [changePasswordDTO, setChangePasswordDTO]=useState({
               email:"",
               password:"",
@@ -25,7 +24,7 @@ const ChangePassword=()=>{
                 setError({txtEmail:"Email is required"});
               }
               Auth.forgotPassword(changePasswordDTO.email)
-                .then(()=>showSuccessMessage("Send OTP code successfully"))
+                .then(()=>alertSuccess("Send OTP code successfully"))
                 .catch(err=>setError({
                     txtOTP: handleAmplifyError(err)
                 }));

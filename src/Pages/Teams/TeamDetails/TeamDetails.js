@@ -23,7 +23,7 @@ const TeamDetails=({team, channelInfo, setChannelInfo})=>{
                                 <nav className="nav nav-pills nav-justified">
                                             {tabTitles.map((title,index)=>
                                                 <Link key={index} className={"nav-link"+(channelInfo.tabIndex===index?" active":"")} 
-                                                    onClick={()=>handleTabClick(index)}>{title}</Link>
+                                                                        onClick={()=>handleTabClick(index)}>{title}</Link>
                                         )}
                                 </nav>
                             </div>
@@ -31,7 +31,7 @@ const TeamDetails=({team, channelInfo, setChannelInfo})=>{
                     </div>
                     <div className="chat-history">
                             {channelInfo.tabIndex==0&&<Members team={team}/>}
-                            {channelInfo.tabIndex==1&&(roleOfOwner==teamRoles.LEADER)
+                            {channelInfo.tabIndex==1&&(roleOfOwner===teamRoles.LEADER)
                                 &&<PendingRequest team={team}/>}
                             {channelInfo.tabIndex==2&&<Channels team={team}/>}
                             {channelInfo.tabIndex==3&&<Settings team={team}/>}

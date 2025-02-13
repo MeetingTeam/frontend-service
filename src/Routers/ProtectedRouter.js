@@ -2,7 +2,6 @@ import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Auth } from "aws-amplify";
 import { Spinner } from "react-bootstrap";
-import DataLoading from "../DataLoading/DataLoading.js";
 
 const ProtectedRouter=({children})=>{
           const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +19,7 @@ const ProtectedRouter=({children})=>{
                     return (<Spinner animation="border" variant="primary" />)
           }
           else{
-                    if(isAuthenticated) return (<DataLoading>{children}</DataLoading>);
+                    if(isAuthenticated) return children;
                     else return  (<Navigate replace to="/login" />);
           }
 }

@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
-import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import UserAPI from "../../APIs/user-service/UserAPI.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
+import { alertError, alertSuccess } from "../../Utils/ToastUtil.js";
 
 const RegisterPage=()=>{
           const navigate = useNavigate();
-          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
           const [userDTO, setUserDTO] = useState({
                     email: '',
                     password: '',
@@ -22,12 +21,10 @@ const RegisterPage=()=>{
                     if(validate){
                         console.log("userDto", userDTO)
                         UserAPI.addUser(userDTO).then(res=>{
-                          showSuccessMessage('Register new account successfully');
+                          alertSuccess('Register new account successfully');
                           navigate("/accountActivation",{ state: { email: userDTO.email } });
                         })
-                        .catch((err)=>{
-                          showErrorMessage(handleAxiosError(err));
-                      })
+                        .catch((err)=>alertError(handleAxiosError(err)))
                 }
           }
           const validateData = (data) => {

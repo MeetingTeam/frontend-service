@@ -5,6 +5,8 @@ import { getMeetingsOfWeek } from "../../old-API/MeetingAPI.js";
 import MeetingModal from "../Teams/VideoChannel/Component/MeetingModal.js";
 import { useSelector } from "react-redux";
 
+const daysOfWeek=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const colors=["btn-primary","btn-secondary","btn-success","btn-danger","btn-warning","btn-info","btn-light","btn-dark"];
 const CalendarPage=()=>{
         const user=useSelector(state=>state.user);
         const [week, setWeek]=useState(0);
@@ -12,8 +14,6 @@ const CalendarPage=()=>{
         const [meetings, setMeetings]=useState([]);
         const [meetingModal, setMeetingModal]=useState(null);   
         const [mIndexesOfDays, setMIndexesOfDays]=useState([[],[],[],[],[],[],[]]);
-        const daysOfWeek=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-        const colors=["btn-primary","btn-secondary","btn-success","btn-danger","btn-warning","btn-info","btn-light","btn-dark"];
         const hours=Array.from({ length: 24 }, (_, i) => i);
 
         function chooseColor(colorIndex){

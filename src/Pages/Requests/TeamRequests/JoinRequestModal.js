@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import TeamRequestAPI from "../../../APIs/team-service/TeamRequestAPI.js";
 import { alertError, alertSuccess } from "../../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
 
 const JoinRequestModal=({setShow})=>{
           const [teamId, setTeamId]=useState("");
@@ -15,7 +16,7 @@ const JoinRequestModal=({setShow})=>{
                         alertSuccess(res.data);
                         setShow(false);
                 })
-                .catch(err=>alertError("There is an error when sending request"))
+                .catch(err=>alertError(handleAxiosError(err)));
           }
           return(
                   <Modal show={true} onHide={()=>setShow(false)}>

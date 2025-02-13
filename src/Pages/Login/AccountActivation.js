@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Auth } from "aws-amplify";
-import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
+import { alertError, alertSuccess } from "../../Utils/ToastUtil.js";
 
 const AccountActivation=()=>{
           const location = useLocation();
           const navigate = useNavigate();
-          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
           const passedEmail= location.state?location.state.email:"";
           const [data, setData]=useState({
                     email: passedEmail,
@@ -25,14 +24,14 @@ const AccountActivation=()=>{
                       setError("Email is required");
                   }
                   Auth.resendSignUp(data.email)
-                    .catch(err=> showErrorMessage(handleAmplifyError(err)));
+                    .catch(err=> alertError(handleAmplifyError(err)));
           }
           function onSubmit(){
                     Auth.confirmSignUp(data.email, data.OTPcode).then(res=>{
-                      showSuccessMessage("Activate account successfully");
+                      alertSuccess("Activate account successfully");
                       navigate("/login");
                     })
-                    .catch(err=> showErrorMessage(handleAmplifyError(err)));
+                    .catch(err=> alertError(handleAmplifyError(err)));
           }
           return(
                     <div className="container">

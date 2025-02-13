@@ -19,7 +19,21 @@ const TeamsPage=()=>{
           const [showTeamModal, setShowTeamModal]=useState(false);
           const { showErrorMessage } = useSnackbarUtil();
 
-          const handleFilter = (item) => {
+          function findTeamAndChannelByIndex(){
+            let team=null, channel=null;
+            if(teams){
+                if(channelInfo.teamIndex<teams.length){
+                    team=teams[channelInfo.teamIndex];
+                    if(team&&team.channels){
+                        if(channelInfo.channelIndex<team.channels.length){
+                            channel= team.channels[channelInfo.channelIndex];
+                        }
+                    } 
+                }
+              }
+              return {team, channel};
+          }
+          function handleFilter(item) {
                     const re = new RegExp("^"+search,"i");
                     return item.teamName.match(re);
           }
@@ -30,12 +44,7 @@ const TeamsPage=()=>{
             .catch(err=>showErrorMessage(handleAxiosError(err)));
           }
 
-          let team=null;
-          let channel=null;
-          if(teams&&teams.length>0){
-            team=teams[channelInfo.teamIndex];
-            if(team.channels.length>0&&channelInfo.channelIndex>=0) channel=team.channels[channelInfo.channelIndex];
-          }
+          const {team, channel}=findTeamAndChannelByIndex();
           const filerTeams=(search==="")?teams:teams.filter(handleFilter);
           return(
             <>

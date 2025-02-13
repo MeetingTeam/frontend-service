@@ -19,15 +19,20 @@ const TeamRequests=()=>{
                 .catch(err=>alertError("Unable to fetch team reuqests.Please try again"));
           },[])
           
-          function handleUnsendButton(requestId){
+          function handleDeleteButton(requestId){
                 TeamRequestAPI.deleteTeamRequest(requestId).then(res=>{
                               setRequests(prev=>prev.filter(request=>request.id!=requestId));
                 })
                 .catch(err=>alertError('Failed to delete request'));
           }
-          const handleFilter = (item) => {
+          function handleFilter(item) {
                     const re = new RegExp("^"+search,"i");
                     return item.team.teamName.match(re);
+          }
+          function getStatus(request){
+            if(request.isAccepted==null) return "PENDING";
+            else if(request.isAccepted) return "ACCEPT";
+            else return "REJECT";
           }
 
           const filterRequests=(search==="")?requests:requests.filter(handleFilter);
@@ -52,19 +57,20 @@ const TeamRequests=()=>{
                               </div>
                               <div className="TableWapper border-bottom border-dark">
                               <table className="table table-hover">
-                              <TableHeader data={["Name","Message","Time","Action"]} />
+                              <TableHeader data={["Team","Message","Time","Status", "Action"]} />
                               <tbody>
                               {filterRequests?.map((request)=> {
+                                        
                                         return (
                                         <tr key={request.id}>
                                                   <td>
-                                                            <Avatar src={request.team.urlIcon}/>
-                                                            {request.team.teamName}
+                                                            <Avatar src={request.team.urlIcon}/> {request.team.teamName}
                                                   </td>
                                                   <td>{request.content}</td>
                                                   <td>{getTimeDistance(request.createdAt)}</td>
+                                                  <td>{getStatus(request)}</td>
                                                   <td>
-                                                            <button type="button" className="btn btn-danger" onClick={()=>handleUnsendButton(request.id)}>Unsend</button>
+                                                            <button type="button" className="btn btn-danger" onClick={()=>handleDeleteButton(request.id)}>Delete</button>
                                                   </td>
                                         </tr>
                                         )

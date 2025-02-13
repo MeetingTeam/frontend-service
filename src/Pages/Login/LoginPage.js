@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import {Auth} from "@aws-amplify/auth";
-import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
+import { alertError, alertSuccess } from "../../Utils/ToastUtil.js";
 
 const LoginPage=()=>{
           const navigate = useNavigate();
-          const { showSuccessMessage, showErrorMessage } = useSnackbarUtil();
-          
           const [form, setForm] = useState({
                     email: '',
                     password: ''
@@ -18,11 +16,11 @@ const LoginPage=()=>{
                     let validate = validateData(form)
                     if(validate){
                       Auth.signIn(form.email, form.password).then(user=>{
-                        showSuccessMessage('Login successfully');
+                        alertSuccess('Login successfully');
                         navigate("/friendsPage");
                       })
                       .catch(err=>{
-                          showErrorMessage(handleAmplifyError(err));
+                          alertError(handleAmplifyError(err));
                       })
                 }
           }
