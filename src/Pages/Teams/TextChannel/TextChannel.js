@@ -36,6 +36,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                             channelInfo: channelInfo, 
                             messages: res.data}))
                     })
+                    .catch(err=>alertError(handleAxiosError(err)));
                 }
             },[channelInfo])
             

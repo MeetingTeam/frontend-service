@@ -14,7 +14,7 @@ const Navbar=()=>{
                 .catch(_=>alertError("Logout unsuccessfully"));
           }
           return(
-                  <header className="p-2 mb-1 border-bottom">
+                  <header className="pb-2 border-bottom">
                     <div className="container">
                       <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         <Link to="/" className="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">

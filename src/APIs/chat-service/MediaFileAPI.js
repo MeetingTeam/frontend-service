@@ -18,10 +18,10 @@ class MediaFileAPI {
                     const presignedUrl= res.data;
                     await axios.put(presignedUrl, file, {
                                         headers: {
-                                                  "Content-Type": file.type
+                                                  "Content-Type": file.type,
+                                                  "x-amz-tagging": "isLinked=false"
                                         }
                               });
-                    console.log("fileUrl", presignedUrl.split('?')[0])
                     return presignedUrl.split('?')[0];
           }
 

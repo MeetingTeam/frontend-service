@@ -30,18 +30,19 @@ export function getDateTime(input){
 }
 
 export function getScheduledTime(meeting){
-          const {scheduledTime, scheduledDaysOfWeek, endDate}=meeting;
+          const {scheduledTime, scheduledDaysOfWeek, startDate, endDate}=meeting;
           if(!scheduledTime) return "";
           const daysOfWeek=["","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Sartuday"]
           const time=DateTime.fromFormat(scheduledTime, "HH:mm:ss");
+          const startDateTime=DateTime.fromISO(startDate);
           if(scheduledDaysOfWeek&&scheduledDaysOfWeek.length>0){
                     let result="Occurs every ";
                     scheduledDaysOfWeek.forEach(day=>{result+=daysOfWeek[day]+","})
                     result+=" at "+time.toFormat("HH:mm");
-                    result+=", from "+time.toFormat("dd-MM-yyyy");
+                    result+=", from "+startDateTime.toFormat("dd/MM/yyyy");
                     if(endDate){
                               const endDateTime=DateTime.fromISO(endDate);
-                              result+=" to "+endDateTime.toFormat("dd-MM-yyyy");
+                              result+=" to "+endDateTime.toFormat("dd/MM/yyyy");
                     }
                     return result;
           }
@@ -53,10 +54,10 @@ export function getDate(luxonDateTime) {
           return luxonDateTime.toISODate();
 }
 
-export function formatBirthday(isoDateStr){
+export function formatDate(isoDateStr){
           if(!isoDateStr) return "";
           const luxonDateTime=DateTime.fromISO(isoDateStr);
-          return luxonDateTime.toFormat("dd-MM-yyyy");
+          return luxonDateTime.toFormat("dd/MM/yyyy");
 }
 
 export function getHourMinuteOnly(isoTimeStr){
@@ -69,10 +70,7 @@ export function getHour(num) {
           else return `${num-12} PM`;
 }
 
-export function getCalendarTime(dateTime) {
-          var result="";
-          var hour=dateTime.getHours();
-          if(hour<=12) result = (hour+":"+dateTime.getMinutes()+" AM");
-          else result = ((hour-12)+":"+dateTime.getMinutes()+" PM");
-          return result;
+export function getCalendarTime(luxonDateTime) {
+          if(!luxonDateTime) return "";
+          return luxonDateTime.toFormat("hh:mm a");
 }

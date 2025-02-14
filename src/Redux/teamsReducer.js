@@ -71,7 +71,7 @@ const teamsReducer=createSlice({
                     addMeeting:(state, action)=>{
                               let meeting=action.payload;
                               let teamIndex=state.findIndex(team=>team.id==meeting.teamId);
-                              if(teamIndex>-1){
+                              if(teamIndex>-1&&state[teamIndex].channels){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==meeting.channelId);
                                         if(channelIndex>-1){
                                                   const channel={...state[teamIndex].channels[channelIndex]};
@@ -82,6 +82,7 @@ const teamsReducer=createSlice({
                                                   }
                                                   else channel.meetings=[meeting]
                                                   state[teamIndex].channels[channelIndex]=channel;
+                                                  console.log("Ok");
                                         }
                               }
                     },

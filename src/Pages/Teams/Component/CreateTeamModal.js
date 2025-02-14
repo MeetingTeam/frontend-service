@@ -4,8 +4,9 @@ import { useDispatch } from "react-redux";
 import { updateTeam } from "../../../Redux/teamsReducer.js";
 import TeamAPI from "../../../APIs/team-service/TeamAPI.js";
 import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
+import { alertError } from "../../../Utils/ToastUtil.js";
 
-const CreateTeamModal=({setShow, showErrorMessage})=>{
+const CreateTeamModal=({setShow})=>{
           const dispatch=useDispatch();
           const [teamName, setTeamName]=useState("");
           function handleSubmit(){
@@ -13,7 +14,7 @@ const CreateTeamModal=({setShow, showErrorMessage})=>{
                               dispatch(updateTeam(res.data));
                               setShow(false);
                 })
-                .catch(err=>showErrorMessage(handleAxiosError(err)));
+                .catch(err=>alertError(handleAxiosError(err)));
           }
           return(
                     <Modal show={true} onHide={()=>setShow(false)}>

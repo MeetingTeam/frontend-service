@@ -9,15 +9,15 @@ import TeamChat from "./TeamChat.js";
 import TeamAPI from "../../APIs/team-service/TeamAPI.js";
 import { loadMoreTeams } from "../../Redux/teamsReducer.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
+import { alertError } from "../../Utils/ToastUtil.js";
 
 const TeamsPage=()=>{
            const dispatch= useDispatch();
           const teams=useSelector(state=>state.teams);
           const [channelInfo, setChannelInfo]=useState({teamIndex:0, channelIndex:0});
           const [searchTerm, setSearchTerm]=useState("");
-          const [search, setSearch]=useState("");
+          const [searchTeamIds, setSearchTeamIds]=useState(null);
           const [showTeamModal, setShowTeamModal]=useState(false);
-          const { showErrorMessage } = useSnackbarUtil();
 
           function findTeamAndChannelByIndex(){
             let team=null, channel=null;
@@ -33,22 +33,37 @@ const TeamsPage=()=>{
               }
               return {team, channel};
           }
-          function handleFilter(item) {
-                    const re = new RegExp("^"+search,"i");
-                    return item.teamName.match(re);
-          }
           function handleShowMoreBtn(){
             TeamAPI.getJoinedTeams(teams.length/10, 10).then(res=>{
                 dispatch(loadMoreTeams(res.data.data));
             })
-            .catch(err=>showErrorMessage(handleAxiosError(err)));
+            .catch(err=>alertError(handleAxiosError(err)));
           }
+           function handleSearchBtn(e){
+                e.preventDefault();
+                if(searchTerm&&searchTerm!="") {
+                        TeamAPI.searchTeamsByName(searchTerm).then(res=>{
+                            var searchTeams=res.data;
+                            setSearchTeamIds(new Set(searchTeams.map(searchTeam=>searchTeam.id)));
+                            dispatch(loadMoreTeams(searchTeams));
+                        })
+                        .catch(err=>alertError(handleAxiosError(err)));
+                      }
+                      else if(searchTeamIds!=null) setSearchTeamIds(null);
+            }
+          function handleFilter(){
+            if(!teams) return null;
+            if(searchTeamIds!=null){
+                return teams.filter(team=>searchTeamIds.has(team.id));
+            }
+            else return teams;
+        }
 
           const {team, channel}=findTeamAndChannelByIndex();
-          const filerTeams=(search==="")?teams:teams.filter(handleFilter);
+          const filerTeams=handleFilter();
           return(
             <>
-            {showTeamModal&&<CreateTeamModal setShow={setShowTeamModal} showErrorMessage={showErrorMessage}/>}
+            {showTeamModal&&<CreateTeamModal setShow={setShowTeamModal}/>}
              <div className="container-fluid">
                     <div className="row clearfix">
                         <div className="col-lg-12">
@@ -56,7 +71,7 @@ const TeamsPage=()=>{
                               <div id="teamslist" className="teams-management">
                                     <div className="teams-control">
                                         <button className="mb-1 btn btn-outline-warning" onClick={()=>setShowTeamModal(true)}>Create a team</button>
-                                        <form className="input-group" onSubmit={(e)=>{e.preventDefault(); setSearch(searchTerm);}}>
+                                        <form className="input-group" onSubmit={(e)=>handleSearchBtn(e)}>
                                                 <span className="input-group-text"><i className="fa fa-search"></i></span>
                                                 <input type="text" className="form-control" placeholder="Search..." onChange={(e)=>setSearchTerm(e.target.value)}/>
                                         </form>

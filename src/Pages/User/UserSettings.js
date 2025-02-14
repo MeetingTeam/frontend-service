@@ -27,7 +27,7 @@ const UserSettings=()=>{
                     }
           }
           function handleSubmit(e){
-                    e.preventDefault()
+                    e.preventDefault();
                     if(file!=null){
                         MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
                             const dto= {...updatedUser};

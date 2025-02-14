@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react"
-import { generateToken } from "../../API/MeetingAPI.js";
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
-import { useSelector } from "react-redux";
-var meetingId;
+import ZegoAPI from "../../APIs/meeting-service/ZegoAPI.js";
+import { alertError } from "../../Utils/ToastUtil.js";
+import { handleAxiosError } from "../../Utils/ErrorUtil.js";
+
 const ZegoMeeting=()=>{
          const [data, setData]=useState(null);
-         const user=useSelector(state=>state.user);
          const meetingId=getMeetingId();
           useEffect(()=>{
-                    if(meetingId) generateToken(meetingId)
-                                        .then(res=>{
-                                                 const returnedData=res.data;
-                                                 returnedData.user=JSON.parse(returnedData.user);
-                                                 setData(returnedData);
-                                        })
-                                        .catch(err=>alert(err));
+                if(meetingId){
+                    ZegoAPI.generateZegoToken(meetingId)
+                            .then(res=>{
+                                setData(res.data);
+                            })
+                            .catch(err=>alertError(handleAxiosError(err)));
+                } 
           },[]); 
+
           function getMeetingId() {
                     let urlStr = window.location.href.split('?')[1];
                     const urlSearchParams = new URLSearchParams(urlStr);
@@ -30,9 +31,9 @@ const ZegoMeeting=()=>{
                               data.user.id, 
                               data.user.nickName
                           );
-                    // Create instance object from Token.
+
                     const zp = ZegoUIKitPrebuilt.create(kitToken);
-                    // start the call
+
                     zp.joinRoom({
                               container: element,
                               sharedLinks: [
@@ -58,6 +59,7 @@ const ZegoMeeting=()=>{
                               showLayoutButton: true,
                     });
           }     
+          
           return(
                     <>
                         {data&&<div className="myCallContainer" 

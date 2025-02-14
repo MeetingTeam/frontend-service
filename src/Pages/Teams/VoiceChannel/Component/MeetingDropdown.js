@@ -60,11 +60,13 @@ const MeetingDropdown=({setMeetingDTO,meeting})=>{
                                                         checked={meeting.isCanceled} onChange={e=>handleCancelSwitch(e)}/>
                                                 <div className="form-check-label">Cancel meeting</div>
                                             </div>}
-                                            <div className="form-check form-switch">
-                                                <input className="form-check-input" type="checkbox" role="switch"
-                                                    checked={checkAddToCalendar()} onChange={e=>handleCalendarSwitch(e)} />
-                                                <div className="form-check-label">Add to calender</div>
-                                            </div>
+                                            {!meeting.isCanceled&&meeting.startDate&&
+                                                <div className="form-check form-switch">
+                                                    <input className="form-check-input" type="checkbox" role="switch"
+                                                        checked={checkAddToCalendar()} onChange={e=>handleCalendarSwitch(e)} />
+                                                    <div className="form-check-label">Add to calender</div>
+                                                </div>
+                                            }
                                             <div className="d-flex align-items-center bg-light rounded-pill reaction-list">
                                                   {emojiCodes.map((emojiCode, index)=>
                                                             <span className="fs-4 me-2" key={index} onClick={(e)=>handleEmoji(e, emojiCode)}>

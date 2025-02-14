@@ -10,6 +10,7 @@ import { Amplify } from 'aws-amplify';
 import ProtectedRouter from './Routers/ProtectedRouter.js';
 import ClientRouter from './Routers/ClientRouter.js';
 import { ToastContainer } from 'react-toastify';
+import ZegoMeeting from './Pages/VideoCall/ZegoMeeting.js';
 
 function App() {
   Amplify.configure(amplifyConfig);
@@ -22,7 +23,7 @@ function App() {
                       <Route path="/register" element={<RegisterPage/>}/>
                       <Route path="/changePassword" element={<ChangePassword/>}/>
                       <Route path="/accountActivation" element={<AccountActivation/>}/>
-                      {/* <Route path="videoCall" element={<ZegoMeeting/>}/> */}
+                      <Route path="/videoCall" element={<ProtectedRouter><ZegoMeeting/></ProtectedRouter>}/>
                       <Route path="/*" element={<ProtectedRouter><ClientRouter/></ProtectedRouter>}/>
                   </Routes>
             </SnackbarProvider>

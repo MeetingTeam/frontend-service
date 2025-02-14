@@ -51,6 +51,6 @@ export function subscribeToTeamTopics(team, dispatch){
           WebSocketService.subscribeToNewTopic(dest, wsTopics.deleteMeeting,
                 (payload)=>{
                         const data=payload;
-                        dispatch(deleteMeeting({...data}))
+                        dispatch(deleteMeeting({teamId: team.id, ...data}))
                   });
 }

@@ -3,11 +3,12 @@ import { tabTitles } from "../../../Utils/Constraints.js";
 
 const DetailsAccordion=({team,setChannelInfo, channelInfo})=>{
           const teams=useSelector(state=>state.teams);
+          
           function handleClickTitle(teamId, tabIndex){
                     setChannelInfo({
                               teamIndex: teams.findIndex(team=>team.id==teamId),
                               channelIndex:-1, 
-                              tabIndex:tabIndex
+                              tabIndex: tabIndex
                     });
           }
           return(

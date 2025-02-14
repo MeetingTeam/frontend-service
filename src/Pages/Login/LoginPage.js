@@ -74,12 +74,6 @@ const LoginPage=()=>{
                                         Password is required
                               </div>
                               </div>
-                              <div className="form-check mb-3">
-                                <input className="form-check-input" type="checkbox" value="" id="rememberPasswordCheck"/>
-                                <label className="form-check-label" htmlFor="rememberPasswordCheck">
-                                  Remember password
-                                </label>
-                              </div>
                               <div className="d-grid">
                                 <button className="btn btn-primary btn-login text-uppercase fw-bold" onClick={()=>onSubmit()}>Sign in</button>
                               </div>

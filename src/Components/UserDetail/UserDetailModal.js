@@ -1,6 +1,5 @@
 import { Modal } from "react-bootstrap";
-import Avatar from "../Avatar/Avartar.js";
-import { formatBirthday } from "../../Utils/DateTimeUtil.js";
+import { formatDate } from "../../Utils/DateTimeUtil.js";
 import BigAvatar from "../Avatar/BigAvatar.js";
 
 const UserDetailModal=({showUserDetail, setShowUserDetail})=>{
@@ -19,7 +18,7 @@ const UserDetailModal=({showUserDetail, setShowUserDetail})=>{
                               <p><strong>Email:</strong> {user.email}</p>
                               <p><strong>Phone:</strong> {user.phoneNumber}</p>
                               <p><strong>Gender:</strong> {user.gender ? "Male" : "Female"}</p>
-                              <p><strong>Birthday:</strong> {formatBirthday(user.birthday)}</p>
+                              <p><strong>Birthday:</strong> {formatDate(user.birthday)}</p>
                     </Modal.Body>
             </Modal> 
           )

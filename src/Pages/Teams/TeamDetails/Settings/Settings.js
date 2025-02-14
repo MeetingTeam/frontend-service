@@ -4,15 +4,21 @@ import MediaFileAPI from "../../../../APIs/chat-service/MediaFileAPI.js";
 import TeamAPI from "../../../../APIs/team-service/TeamAPI.js";
 import { handleAxiosError } from "../../../../Utils/ErrorUtil.js";
 import { alertError, alertSuccess } from "../../../../Utils/ToastUtil.js";
+import DeleteTeamModal from "./DeleteTeamModal.js";
+import { useSelector } from "react-redux";
+import { teamRoles } from "../../../../Utils/Constraints.js";
 
 const Settings=({team})=>{
+          const user=useSelector(state=>state.user);
           const [teamDTO, setTeamDTO]=useState({
                     id: team.id,
                     teamName: null,
                     autoAddMember: null,
                     urlIcon: null
-          })
+          });
           const [file, setFile]=useState(null);
+          const [showDeleteModal, setShowDeleteModal]=useState(false);
+          const roleOfOwner=team.members?.find(member=>member.user.id==user.id)?.role;
           
           async function copyToClipboard(){
                 await navigator.clipboard.writeText(team.id);
@@ -43,9 +49,11 @@ const Settings=({team})=>{
                         })
                         .catch(err=>alertError(handleAxiosError(err)));
                     }
-                    
-          }
+            }
+       
           return(
+            <>
+                {showDeleteModal&&<DeleteTeamModal team={team} setShow={setShowDeleteModal}/>}
                   <Form>
                                 <Row className="mb-1">
                                         <Form.Group as={Col} sm={5} controlId="teamId">  
@@ -72,8 +80,13 @@ const Settings=({team})=>{
                                                   <Form.Check type="switch" onChange={(e)=>handleOnChange(e,"autoAddMember")} defaultValue={team.autoAddMember=="true"}/>
                                         </Form.Group>
                               </Row>
-                              <Button size="sm" variant="primary" onClick={(e)=>handleSubmitButton(e)}>Submit</Button>
+                              <div className="mt-3">
+                                    {roleOfOwner==teamRoles.LEADER&&
+                                        <Button size="sm" className="mx-1" variant="danger" onClick={()=>setShowDeleteModal(true)}>Delete Team</Button>}
+                                    <Button size="sm" className="mx-1" variant="primary" onClick={(e)=>handleSubmitButton(e)}>Update Team</Button>
+                              </div>
                   </Form>
+            </>
           )
 }
 export default Settings;

@@ -19,6 +19,14 @@ class TeamAPI {
             pageSize
         });
     }
+
+    searchTeamsByName(searchName){
+        return AxiosService.get(`${teamEndpoint}/search/${searchName}`);
+    }
+
+    deleteTeam(teamId){
+        return AxiosService.delete(`${teamEndpoint}/${teamId}`);
+    }
 }
 
 export default new TeamAPI();

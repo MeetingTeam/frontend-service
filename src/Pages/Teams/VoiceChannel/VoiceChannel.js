@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadChannelMeetings } from "../../../Redux/teamsReducer.js";
 import MeetingModal from "./Component/MeetingModal.js";
-import { Link, useNavigate} from "react-router-dom";
 import MeetingAPI from "../../../APIs/meeting-service/MeetingAPI.js";
 import { useSnackbarUtil } from "../../../Utils/SnackbarUtil.js";
 import { handleAxiosError } from "../../../Utils/ErrorUtil.js";
@@ -16,7 +15,6 @@ import Avatar from "../../../Components/Avatar/Avartar.js";
 
 const VoiceChannel=({team, channel, channelInfo})=>{
           const dispatch=useDispatch();
-          const navigate= useNavigate();
           const { showErrorMessage } = useSnackbarUtil();
           const user=useSelector(state=>state.user);
           const [reactions, setReactions]=useState(null);
@@ -53,8 +51,8 @@ const VoiceChannel=({team, channel, channelInfo})=>{
                   endDate: null,
                   scheduledDaysOfWeek: []
               }).then(res=>{
-                var meetingId=res.data;
-                navigate("/videoCall?meetingId="+meetingId);
+                var resMeeting=res.data;
+                window.open(`/videoCall?meetingId=${resMeeting.id}`, "_blank");
               }).catch(err=>showErrorMessage(handleAxiosError(err)));
           }
           function handleAddMeetingsButton(){
@@ -101,7 +99,7 @@ const VoiceChannel=({team, channel, channelInfo})=>{
                                                   </div>
                                         </div>
                                         <div className="mt-3 d-flex justify-content-between">
-                                                  <button className="btn btn-warning" onClick={()=>navigate("/videoCall?meetingId="+meeting.id)}  disabled={meeting.isCanceled}>Join</button>
+                                                  <button className="btn btn-warning" onClick={()=>window.open(`/videoCall?meetingId=${meeting.id}`, "_blank")}  disabled={meeting.isCanceled}>Join</button>
                                                   <MeetingDropdown team={team} setMeetingDTO={setMeeting} meeting={meeting}/>
                                                   <ReactionList reactions={meeting.reactions} setReactions={setReactions}/>
                                      </div>

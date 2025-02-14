@@ -54,7 +54,7 @@ const Members=({team})=>{
                                     <input className="form-control me-2" type="search" placeholder="Search by name" id="Search" onChange={(e)=>setSearchTerm(e.target.value)}/>
                               </form>
                     </div>
-                    <div className="TableWapper border-bottom border-dark">
+                    <div className="tableWapper border-bottom border-dark">
                         <table className="table table-hover">
                             <TableHeader data={["Name", "Email","Last active","Role","Action"]} />
                             <tbody>

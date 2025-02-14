@@ -110,8 +110,8 @@ const MeetingModal=({meeting, setShow, noChange})=>{
                                                 </div>
                                         </Row>
                                         <Row className="mb-3">
-                                                <Form.Group as={Col} controlId="endDate" disabled={meetingDTO.scheduledDaysOfWeek.size==0}>
-                                                        <Form.Label>End Date(if schedule meeting repeatly)</Form.Label>
+                                                <Form.Group as={Col} controlId="endDate" disabled={meetingDTO.scheduledDaysOfWeek.length==0}>
+                                                        <Form.Label>End Date (if schedule meeting repeatly)</Form.Label>
                                                         <Form.Control type="date" onChange={(e)=>handleOnChange(e,"endDate")} defaultValue={meeting.endDate}/>
                                                         <div style={error.txtEndDate? { display: ''} : { display: 'none' }} className="error">{error.txtEndDate}</div>
                                                 </Form.Group>
@@ -122,6 +122,6 @@ const MeetingModal=({meeting, setShow, noChange})=>{
                         <Button variant="primary" onClick={(e)=>handleSubmit(e)}>Submit</Button>
                     </Modal.Footer>}
         </Modal>
-          )
+        )
 }
 export default MeetingModal;
