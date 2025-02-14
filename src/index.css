@@ -2,11 +2,12 @@
   color: red;
   font-style: italic;
 }
-.ContentAlignment{
+.contentAlignment{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 10px;
 }
 .contentCenter{
   display: flex;
@@ -14,11 +15,6 @@
   justify-content: center;
   align-items: center;
   margin-top:"20%"
-}
-.avatar{
-  border-radius: 40px;
-  width: 40px;
-  height: 40px;
 }
 .btn-circle {
   width: 50px;
@@ -28,5 +24,8 @@
   text-align: center;
   font-size: 12px;
   line-height: 1.42857;
+}
+.toast-message{
+  font-size: 15px;
 }
 

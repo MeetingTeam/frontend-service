@@ -1,15 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { messageTypes } from "../Utils/Constraints.js";
 
 const teamsReducer=createSlice({
           name: "teams",
-          initialState:[],
+          initialState: null,
           reducers:{
                     loadTeams:(state, action)=>{
                               return action.payload;
                     },
+                    loadMoreTeams: (state, action)=>{
+                              const addedTeams= action.payload;
+                              if(state==null) return addedTeams;
+
+                              const stateTeamsSet= new Set(state.map(team=>team.id));
+                              addedTeams.forEach(addedTeam=>{
+                                        if(!stateTeamsSet.has(addedTeam.id))
+                                                  state.push(addedTeam);
+                              });
+                    },
                     addTeamChatMessage:(state,action)=>{
-                              const {teamId, message}=action.payload;
-                              const teamIndex=state.findIndex((team)=>team.id==teamId);
+                              const message=action.payload;
+                              const teamIndex=state.findIndex(team=>team.id==message.teamId);
                               if(teamIndex>-1){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==message.channelId);
                                         if(channelIndex>-1){
@@ -17,8 +28,7 @@ const teamsReducer=createSlice({
                                                   if(channel.messages){
                                                             let messIndex=channel.messages.findIndex(mess=>mess.id==message.id);
                                                             if(messIndex>-1){
-                                                                      if(message.messageType=="VOTING"){
-                                                                                console.log("Voting message",message);
+                                                                      if(message.type==messageTypes.VOTING){
                                                                                 channel.messages=channel.messages.filter(mess=>mess.id!=message.id);
                                                                                 channel.messages.push(message);
                                                                       }                                                         
@@ -46,10 +56,6 @@ const teamsReducer=createSlice({
                     },
                     loadChannelMeetings:(state, action)=>{
                               const {channelInfo, meetings}=action.payload;
-                              for(let i=0;i<meetings.length;i++){
-                                        meetings[i].scheduledDaysOfWeek=new Set(meetings[i].scheduledDaysOfWeek||[]);
-                                        meetings[i].emailsReceivedNotification=new Set(meetings[i].emailsReceivedNotification||[])
-                              }
                               let channel=state[channelInfo.teamIndex].channels[channelInfo.channelIndex];
                               if(!channel.meetings||channel.meetings.length==0)
                                         channel.meetings=meetings;
@@ -62,12 +68,10 @@ const teamsReducer=createSlice({
                               state[channelInfo.teamIndex].channels[channelInfo.channelIndex]=channel;
                               return state;
                     },
-                    updateMeetings:(state, action)=>{
-                              let {teamId, meeting}=action.payload;
-                              meeting.scheduledDaysOfWeek=new Set(meeting.scheduledDaysOfWeek||[]);
-                              meeting.emailsReceivedNotification=new Set(meeting.emailsReceivedNotification||[])
-                              let teamIndex=state.findIndex(team=>team.id==teamId);
-                              if(teamIndex>-1){
+                    addMeeting:(state, action)=>{
+                              let meeting=action.payload;
+                              let teamIndex=state.findIndex(team=>team.id==meeting.teamId);
+                              if(teamIndex>-1&&state[teamIndex].channels){
                                         let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==meeting.channelId);
                                         if(channelIndex>-1){
                                                   const channel={...state[teamIndex].channels[channelIndex]};
@@ -78,6 +82,7 @@ const teamsReducer=createSlice({
                                                   }
                                                   else channel.meetings=[meeting]
                                                   state[teamIndex].channels[channelIndex]=channel;
+                                                  console.log("Ok");
                                         }
                               }
                     },
@@ -87,46 +92,82 @@ const teamsReducer=createSlice({
                               if(teamIndex>-1){
                                         let team={...state[teamIndex]};
                                         let channelIndex=team.channels.findIndex(channel=>channel.id==channelId);
-                                        team.channels[channelIndex].meetings=team.channels[channelIndex].meetings.filter(meeting=>meeting.id!=meetingId);
-                                        state[teamIndex]=team;
+                                        if(channelIndex>-1){
+                                                  team.channels[channelIndex].meetings=team.channels[channelIndex].meetings.filter(meeting=>meeting.id!=meetingId);
+                                                  state[teamIndex]=team;
+                                        }
                               }
                     },
                     updateTeam:(state, action)=>{
-                              const updatedTeam=action.payload;
-                              const teamIndex=state.findIndex(team=>team.id==updatedTeam.id);
-                              if(teamIndex==-1) state.push(updatedTeam);
-                              else state[teamIndex]={...state[teamIndex], teamName:updatedTeam.teamName, urlIcon: updatedTeam.urlIcon, autoAddMember: updatedTeam.autoAddMember}
+                              const updatedTeam = action.payload;
+                              const teamIndex = state.findIndex(team => team.id === updatedTeam.id);
+                              console.log("updatedTeam", updateTeam);
+                              console.log("teamIndex", teamIndex);
+                              if (teamIndex>-1) {
+                                        state[teamIndex]={
+                                                  ...state[teamIndex], 
+                                                  teamName: updatedTeam.teamName,
+                                                  urlIcon: updatedTeam.urlIcon,
+                                                  autoAddMember: updatedTeam.autoAddMember
+                                        }
+                              } else {
+                                        if(state) state.push(updatedTeam);
+                                        else state=[updateTeam];
+                              }
                     },
                     deleteTeam:(state, action)=>{
                               const teamId=action.payload;
                               return state.filter(team=>team.id!==teamId);
                     },
-                    updateMembers:(state, action)=>{
+                    addMembers:(state, action)=>{
                               const {teamId,newMembers}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              const members=state[teamIndex].members;
-                              newMembers.forEach(newMember=> {
-                                        const memberIndex=members.findIndex(member=>member.u.id==newMember.u.id);
-                                        if(memberIndex>=0) members[memberIndex]=newMember;
-                                        else members.push(newMember);
-                              });
-                              state[teamIndex].members=members;
+                              if(teamIndex>-1){
+                                        const members= state[teamIndex].members;
+                                        if(members&&members.length>0){
+                                                  newMembers.forEach(newMember=> {
+                                                            const memberIndex=members.findIndex(member=>member.user.id==newMember.user.id);
+                                                            if(memberIndex>=0) members[memberIndex]=newMember;
+                                                            else members.push(newMember);
+                                                  });
+                                                  state[teamIndex].members=members;
+                                        }
+                                        else state[teamIndex].members= newMembers;
+                              }
                     },
-                    updateChannels:(state, action)=>{
+                    deleteMember:(state, action)=>{
+                              const {teamId, memberId}= action.payload;
+                              const teamIndex=state.findIndex(team=>team.id==teamId);
+                              if(teamIndex>-1){
+                                        const team=state[teamIndex];
+                                        if(team.members){
+                                                  state[teamIndex].members=team.members.filter(member=>member.user.id!==memberId);
+                                        }
+                              }
+                    },
+                    addChannel:(state, action)=>{
                               const {teamId, newChannel}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==newChannel.id);
-                              if(channelIndex>=0) state[teamIndex].channels[channelIndex]=newChannel;
-                              else state[teamIndex].channels.push(newChannel);
+                              if(teamIndex>-1){
+                                        let channelIndex=state[teamIndex].channels.findIndex(channel=>channel.id==newChannel.id);
+                                        if(channelIndex>=0) state[teamIndex].channels[channelIndex]=newChannel;
+                                        else state[teamIndex].channels.push(newChannel);
+                              }
                     },
                     removeChannel:(state, action)=>{
                               const {teamId, channelId}=action.payload;
                               const teamIndex=state.findIndex(team=>team.id==teamId);
-                              state[teamIndex].channels=state[teamIndex].channels.filter(channel=>channel.id!=channelId);
+                              if(teamIndex>-1){
+                                        const channels=state[teamIndex].channels;
+                                        if(channels&&channels.length>0){
+                                                  state[teamIndex].channels=channels.filter(channel=>channel.id!=channelId);
+                                        }
+                              }
                     }
           }
 })
-export const {loadTeams, addTeamChatMessage, loadMoreMessages,
-                    loadChannelMeetings, updateMeetings,deleteMeeting,
-           updateMembers, updateChannels, removeChannel, updateTeam, deleteTeam} =teamsReducer.actions;
+export const {loadTeams,loadMoreTeams, addTeamChatMessage, loadMoreMessages,
+            loadChannelMeetings, addMeeting,deleteMeeting,
+           addMembers, deleteMember, addChannel, removeChannel, 
+           updateTeam, deleteTeam} =teamsReducer.actions;
 export default teamsReducer.reducer;

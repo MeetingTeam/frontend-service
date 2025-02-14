@@ -2,16 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userReducer=createSlice({
           name:"user",
-          initialState:{},
+          initialState: null,
           reducers:{
                     loadUser:(state, action)=>{
                               const user=action.payload;
-                              user.calendarMeetingIds=new Set(user.calendarMeetingIds||[]);
                               return user;
-                    },
-                    updateCalendarMeetingIds:(state, action)=>{
-                              const meetingIds=action.payload;
-                              state.calendarMeetingIds=meetingIds;
                     }
           }
 })

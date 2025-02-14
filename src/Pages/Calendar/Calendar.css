@@ -1,0 +1,36 @@
+.meeting-info{
+          margin-top: 6px;
+}
+.time-info{
+          font-style: italic;
+          font-size: 14px;
+}
+
+.fixed-table {
+          width: 100%;
+          table-layout: fixed; /* Ensures equal width for columns */
+}
+
+.fixed-table th,
+.fixed-table td {
+          width: auto;
+          text-align: center;
+          word-wrap: break-word;
+}
+
+.table-container {
+          width: 100%;
+          overflow-x: auto;
+}
+
+.table-header-wrapper table thead th {
+          background-color: #86d4f5 ;
+          color: #fff;
+}  
+
+.table-body-wrapper {
+          max-height: 470px;
+          overflow-y: auto;
+          display: block;
+          width: 100%;
+}

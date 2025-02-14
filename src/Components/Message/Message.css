@@ -1,0 +1,35 @@
+.unsendMessage{
+          font-style: italic !important;
+          color: grey !important;
+}
+
+.reaction {
+          position: relative;
+          bottom: -20px;
+          right: 0;
+          background: white;
+          color: black;
+          border-radius: 30%;
+          width: fit-content;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.reaction-list {
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%; 
+  }
+
+.customImage{
+    width: auto !important;
+    height: auto !important;
+    max-width: 500px !important;
+    max-height: 500px !important;
+    object-fit: contain !important;
+}
+      
