@@ -5,15 +5,14 @@ import LoginPage from './Pages/Login/LoginPage';
 import RegisterPage from './Pages/Login/RegisterPage';
 import ChangePassword from './Pages/Login/ChangePassword.js';
 import AccountActivation from './Pages/Login/AccountActivation.js';
-import { amplifyConfig } from './Configs/AmplifyConfig.js';
-import { Amplify } from 'aws-amplify';
 import ProtectedRouter from './Routers/ProtectedRouter.js';
 import ClientRouter from './Routers/ClientRouter.js';
 import { ToastContainer } from 'react-toastify';
 import ZegoMeeting from './Pages/VideoCall/ZegoMeeting.js';
+import { configAmplify } from './Configs/AmplifyConfig.js';
 
 function App() {
-  Amplify.configure(amplifyConfig);
+  configAmplify(true);
   return (
         <BrowserRouter>
             <ToastContainer/>

@@ -20,7 +20,6 @@ import EmojiPickerPopover from "../../Components/ChatControl/EmojiPickerPopover.
 
 const FriendChat=({friend, indexChatFriend})=>{
           const dispatch=useDispatch();
-          const { showErrorMessage } = useSnackbarUtil();
           const user=useSelector(state=>state.user);
           const [textContent, setTextContent]=useState("");
           const [replyMessage, setReplyMessage]=useState(null);
@@ -32,7 +31,7 @@ const FriendChat=({friend, indexChatFriend})=>{
                     MessageAPI.getPrivateMessages(0, friend.id).then(res=>{
                         dispatch(loadMoreMessages({messages: res.data,friendIndex: indexChatFriend}))
                     })
-                    .catch(err=>showErrorMessage(handleAxiosError(err)));
+                    .catch(err=>alertError(handleAxiosError(err)));
                 }
           },[friend])
           
@@ -48,7 +47,7 @@ const FriendChat=({friend, indexChatFriend})=>{
                     setReplyMessage(null);
                 }
                 MessageAPI.sendTextMessage(chatMessage)
-                        .catch(err=>showErrorMessage(handleAxiosError(err)));
+                        .catch(err=>alertError(handleAxiosError(err)));
                 setTextContent("");
           }
           function handleAddMessagesButton(){
@@ -59,16 +58,16 @@ const FriendChat=({friend, indexChatFriend})=>{
                             friendIndex: indexChatFriend
                     }))
                 })
-                .catch(err=>showErrorMessage(handleAxiosError(err)));
+                .catch(err=>alertError(handleAxiosError(err)));
           }
           function handleUpload(e){
                 const file=e.target.files[0];
                 if(!file) {
-                    showErrorMessage("File is not choosen. Please try again");
+                    alertError("File is not choosen. Please try again");
                     return;
                 }
                 if(file.size>100000000) {
-                    showErrorMessage("File too big");
+                    alertError("File too big");
                     return;
                 }
                 MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
@@ -81,9 +80,9 @@ const FriendChat=({friend, indexChatFriend})=>{
                             }
                         }
                         MediaFileAPI.sendFileMessage(fileMessage)
-                            .catch(()=> showErrorMessage("Failed to uplaod file"));
+                            .catch(()=> alertError("Failed to uplaod file"));
                 })
-                .catch(()=> showErrorMessage("Failed to upload file"));
+                .catch(()=> alertError("Failed to upload file"));
                 e.target.value="";
           }
           function handleEmojiPicker(emojiData){

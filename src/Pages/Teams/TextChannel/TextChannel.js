@@ -22,7 +22,6 @@ import { alertError } from "../../../Utils/ToastUtil.js";
 
 const TextChannel=({team, channel, channelInfo})=>{
             const dispatch=useDispatch();
-            const { showErrorMessage } = useSnackbarUtil();
             const user=useSelector(state=>state.user);
             const [textContent, setTextContent]=useState("");
             const [replyMessage, setReplyMessage]=useState(null);
@@ -52,7 +51,8 @@ const TextChannel=({team, channel, channelInfo})=>{
                     textMessage.parentMessageId=replyMessage.id;
                     setReplyMessage(null);
                 }
-                MessageAPI.sendTextMessage(textMessage).catch(err=>showErrorMessage(handleAxiosError(err)));
+                MessageAPI.sendTextMessage(textMessage)
+                    .catch(err=>alertError(handleAxiosError(err)));
                 setTextContent("");
           }
           function handleAddMessagesButton(){
@@ -65,27 +65,27 @@ const TextChannel=({team, channel, channelInfo})=>{
           function handleUpload(e){
                 const file=e.target.files[0];
                 if(!file) {
-                    showErrorMessage("File is not choosen. Please try again");
-                        return;
-                    }
-                    if(file.size>100000000) {
-                        showErrorMessage("File too big");
-                        return;
-                    }
-                    MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
-                                  const fileMessage={
+                    alertError("File is not choosen. Please try again");
+                    return;
+                }
+                if(file.size>100000000) {
+                    alertError("File too big");
+                    return;
+                }
+                MediaFileAPI.uploadFileToS3(file).then(fileUrl=>{
+                                const fileMessage={
                                       teamId: team.id,
                                       channelId: channel.id,
                                       mediaFile: {
                                           fileUrl: fileUrl,
                                           fileType: file.type,
                                           fileSizeInBytes: file.size
-                                      }
-                                  }
-                                  MediaFileAPI.sendFileMessage(fileMessage)
-                                      .catch(()=> showErrorMessage("Failed to uplaod file"));
+                                    }
+                                }
+                                MediaFileAPI.sendFileMessage(fileMessage)
+                                    .catch(()=> alertError("Failed to uplaod file"));
                           })
-                          .catch(()=> showErrorMessage("Failed to upload file"));
+                          .catch(()=> alertError("Failed to upload file"));
                           e.target.value="";
             }
           function handleEmojiPicker(emojiData){
