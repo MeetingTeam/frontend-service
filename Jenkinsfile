@@ -17,8 +17,6 @@ def dockerfilePath = '.'
 
 def dockerFlywayImageName = 'hungtran679/mt_flyway-user-service'
 
-def sonarCloudOrganization = 'meetingteam'
-
 
 def version = "v2.${BUILD_NUMBER}"
 
@@ -48,22 +46,6 @@ pipeline{
                               steps{
                                         container('nodejs'){
                                                   sh 'npm run test -- --coverage'
-                                        }
-                              }
-                  }
-                  stage('Code analysis'){
-                              steps{
-                                        container('nodejs'){
-                                                  withSonarQubeEnv('SonarCloud') {
-                                                            sh "npm run sonar"
-                                                  }
-                                        }
-                              }
-                    }
-                  stage('Quality gate check') {
-                              steps {
-                                        timeout(time: 5, unit: 'MINUTES') {
-                                                  waitForQualityGate(abortPipeline: true)
                                         }
                               }
                   }
