@@ -1,0 +1,7 @@
+organization=meetingteam
+projectKey=frontend-service
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.60919
+dashboardUrl=https://sonarcloud.io/dashboard?id=frontend-service
+ceTaskId=AZWvLW18VwRC-lOKuorx
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZWvLW18VwRC-lOKuorx

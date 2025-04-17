@@ -4,6 +4,7 @@ import "./Login.css";
 import {Auth} from "@aws-amplify/auth";
 import { handleAmplifyError } from "../../Utils/ErrorUtil.js";
 import { alertError, alertSuccess } from "../../Utils/ToastUtil.js";
+import { configAmplify } from "../../Configs/AmplifyConfig.js";
 
 const LoginPage=()=>{
           const navigate = useNavigate();
@@ -11,10 +12,14 @@ const LoginPage=()=>{
                     email: '',
                     password: ''
                 });
+          const [rememberMe, setRememberMe]= useState(true);
           const [error,setError]=useState({ txtEmail: false, txtPassword: false });
-          const onSubmit=()=>{
+          
+          function onSubmit() {
                     let validate = validateData(form)
                     if(validate){
+                      console.log("remeberMe", rememberMe)
+                      configAmplify(rememberMe);
                       Auth.signIn(form.email, form.password).then(user=>{
                         alertSuccess('Login successfully');
                         navigate("/friendsPage");
@@ -24,7 +29,7 @@ const LoginPage=()=>{
                       })
                 }
           }
-          const handleChangeValue = (e) => {
+          function handleChangeValue(e) {
                     let name = e.target.name;
                     let value = e.target.value;
                     if (name == 'email') {
@@ -34,7 +39,7 @@ const LoginPage=()=>{
                         setForm({ ...form, password: value })
                     }
                 }
-          const validateData = (data) => {
+          function validateData(data) {
                     let isValid = true;
                     let txtEmail, txtPassword;
                     if (data.email.trim().length == 0) {
@@ -52,6 +57,7 @@ const LoginPage=()=>{
                     setError({ ...error, txtEmail: txtEmail, txtPassword: txtPassword })
                     return isValid;
           }
+          
           return(
                   <div className="container">
                     <div className="row">
@@ -72,6 +78,10 @@ const LoginPage=()=>{
                                 <label htmlFor="floatingPassword">Password</label>
                                 <div style={error.txtPassword ? { display: ''} : { display: 'none' }} className="error">
                                         Password is required
+                              </div>
+                              <div className="form-check mb-3">
+                                <input className="form-check-input" type="checkbox" defaultChecked={rememberMe} onClick={e=>setRememberMe(e.target.checked)} id="rememberMeCheck"/>
+                                <label className="form-check-label" htmlFor="rememberMeCheck">Remember Me</label>
                               </div>
                               </div>
                               <div className="d-grid">

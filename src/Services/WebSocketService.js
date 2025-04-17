@@ -16,6 +16,7 @@ class WebsocketService {
     if (!this.sock || this.sock.readyState === SockJS.CLOSED) {
       this.sock = new SockJS(this.websocketEndpoint);
       this.stompClient = Stomp.over(this.sock);
+      this.stompClient.debug = null
       
       const jwtToken= await getAccessToken()
 

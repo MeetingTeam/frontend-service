@@ -1,0 +1,142 @@
+def baseRepoUrl = 'https://github.com/MeetingTeam'
+def mainBranch = 'main'
+
+def appRepoName = 'frontend-service'
+def appRepoUrl = "${baseRepoUrl}/${appRepoName}.git"
+def appVersion = "1.0"
+
+def k8SRepoName = 'k8s-repo'
+def helmPath = "${k8SRepoName}/application/${appRepoName}"
+def helmValueFile = "values.test.yaml"
+
+def dockerhubAccount = 'dockerhub'
+def githubAccount = 'github'
+
+def imageVersion = "${appVersion}-${BUILD_NUMBER}"
+
+def trivyReportFile = "report_trivy.html"
+
+pipeline{
+         agent {
+                    kubernetes {
+                              inheritFrom 'nodejs'
+                    }
+          }
+          
+          environment {
+                    DOCKER_REGISTRY = 'registry-1.docker.io'
+                    DOCKER_IMAGE_NAME = 'hungtran679/mt_chat-service'
+                    DOCKER_IMAGE = "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageVersion}"    
+          }
+          
+          stages{
+                      stage('Install stage'){
+                              steps{
+                                        container('nodejs'){
+                                              sh 'npm install'                                       
+                                        }
+                              }
+                    }
+                  stage('Test stage'){
+                              steps{
+                                        container('nodejs'){
+                                                  sh 'npm run test -- --coverage'
+                                        }
+                              }
+                  }
+                  stage('Build Stage'){
+                              when{ branch mainBranch }
+                              steps{
+                                        container('nodejs'){
+                                                  sh 'npm run build'
+                                        }
+                              }
+                  }
+                    stage('Build and push docker image'){
+                              when{ branch mainBranch }
+                              steps{
+                                        container('kaniko'){
+                                                   withCredentials([
+                                                            string(credentialsId: kanikoAccount, variable: 'KANIKO_AUTH')
+                                                  ]) {
+                                                      script {
+                                                          def dockerConfig = """
+                                                            {
+                                                              "auths": {
+                                                                "${DOCKER_REGISTRY}": {
+                                                                  "auth": "${KANIKO_AUTH}"
+                                                                }
+                                                              }
+                                                            }
+                                                            """
+                                                          writeFile file: 'config.json', text: dockerConfig.trim()
+                                                          
+                                                          sh """
+                                                            mv config.json /kaniko/.docker/config.json
+                                                            /kaniko/executor \
+                                                              --context=. \
+                                                              --dockerfile=Dockerfile \
+                                                              --destination=${DOCKER_IMAGE}
+                                                          """
+                                                      }
+                                              }
+                                        }
+                              }
+                    }
+                  stage('Scan built image'){
+                              when{ branch mainBranch }
+                              steps{
+                                        container('trivy'){
+                                                sh """
+                                                    wget -O html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
+                                                    trivy image --format template --template \"@html.tpl\" -o ${trivyReportFile} \
+                                                        --timeout 15m --scanners vuln ${DOCKER_IMAGE}
+                                                """
+                                        }
+                              }
+                  }
+                    stage('Update k8s repo'){
+                              when{ branch mainBranch }
+                              steps {
+				                                  withCredentials([
+                                                usernamePassword(
+                                                      credentialsId: githubAccount, 
+                                                      passwordVariable: 'GIT_PASS', 
+                                                      usernameVariable: 'GIT_USER'
+                                                )
+                                          ]) {
+                                                sh """
+                                                      git clone https://\${GIT_USER}:\${GIT_PASS}@github.com/MeetingTeam/${k8SRepoName}.git --branch ${mainBranch}
+                                                      cd ${helmPath}
+                                                      sed -i 's|  tag: .*|  tag: "${imageVersion}"|' ${helmValueFile}
+
+                                                      git config --global user.email "jenkins@gmail.com"
+                                                      git config --global user.name "Jenkins"
+                                                      git add .
+                                                      git commit -m "feat: update application image of helm chart '${appRepoName}' to version ${imageVersion}"
+                                                      git push origin ${mainBranch}
+                                                """		
+				                              }				
+                              }
+                    }
+          }
+          post {
+                always {
+                      archiveArtifacts artifacts: trivyReportFile, allowEmptyArchive: true, fingerprint: true
+                }
+                success {
+                        emailext(
+                            subject: "Build Success: ${currentBuild.fullDisplayName}",
+                            body: "The build completed successfully!. Check the logs and artifacts if needed.",
+                            to: '22520527@gm.uit.edu.vn'
+                        )
+                }
+                failure {
+                        emailext(
+                                    subject: "Build Failed: ${currentBuild.fullDisplayName}",
+                                    body: "The build has failed. Please check the logs for more information.",
+                                    to: '22520527@gm.uit.edu.vn'
+                            )
+                }
+        }
+}

@@ -46,6 +46,9 @@ const FriendsPage=()=>{
             }
             else return friends;
         }
+        function getApiVerion(){
+            
+        }
         
         const filterFriends=handleFilter();
         const chatFriend=(filterFriends&&filterFriends.length>0)?filterFriends[indexChatFriend]:null;
