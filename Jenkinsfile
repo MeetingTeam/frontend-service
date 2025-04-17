@@ -11,6 +11,7 @@ def helmValueFile = "values.test.yaml"
 
 def dockerhubAccount = 'dockerhub'
 def githubAccount = 'github'
+def kanikoAccount = 'kaniko'
 
 def imageVersion = "${appVersion}-${BUILD_NUMBER}"
 
@@ -52,7 +53,7 @@ pipeline{
                                         }
                               }
                   }
-                    stage('Build and push docker image'){
+                  stage('Build and push docker image'){
                               when{ branch mainBranch }
                               steps{
                                         container('kaniko'){
