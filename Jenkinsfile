@@ -48,7 +48,7 @@ pipeline{
                         steps {
                               container('sonar') {
                                     withSonarQubeEnv('SonarServer') {
-                                        sh "sonar-scanner"
+                                        sh "sonar-scanner -Dsonar.sources=src -Dsonar.projectKey=${appRepoName}"
                                    }
                             }
                         }
