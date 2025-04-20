@@ -45,29 +45,21 @@ pipeline{
                               }
                   }
                   stage('Code analysis') {
-                    steps {
-                            container('nodejs') {
-                                  script {
-                                      withSonarQubeEnv('SonarServer') {
-                                        def sonarQubeSettings = """
-                                          sonar.host.url=${env.SONAR_HOST_URL}
-                                          sonar.token=${env.SONAR_AUTH_TOKEN}
-                                          sonar.sources=src
-                                        """
-                                        writeFile file: 'sonar-project.properties', text: sonarQubeSettings.trim()
-                                        sh "npm run sonar"
-                                    }
-                                }
+                        steps {
+                              container('sonar') {
+                                    withSonarQubeEnv('SonarServer') {
+                                        sh "sonar-scanner"
+                                   }
                             }
                         }
                   }
-                    stage('Quality gate check') {
+                  stage('Quality gate check') {
                               steps {
                                         timeout(time: 5, unit: 'MINUTES') {
                                                   waitForQualityGate(abortPipeline: true)
                                         }
                               }
-                    }
+                  }
                   stage('Build Stage'){
                               when{ branch mainBranch }
                               steps{
