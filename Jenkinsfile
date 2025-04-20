@@ -7,9 +7,8 @@ def appVersion = "1.0"
 
 def k8SRepoName = 'k8s-repo'
 def helmPath = "${k8SRepoName}/application/${appRepoName}"
-def helmValueFile = "values.test.yaml"
+def helmValueFile = "values.dev.yaml"
 
-def dockerhubAccount = 'dockerhub'
 def githubAccount = 'github'
 def kanikoAccount = 'kaniko'
 
@@ -26,7 +25,7 @@ pipeline{
           
           environment {
                     DOCKER_REGISTRY = 'registry-1.docker.io'
-                    DOCKER_IMAGE_NAME = 'hungtran679/mt_chat-service'
+                    DOCKER_IMAGE_NAME = 'hungtran679/mt_frontend-service'
                     DOCKER_IMAGE = "${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageVersion}"    
           }
           
@@ -45,6 +44,30 @@ pipeline{
                                         }
                               }
                   }
+                  stage('Code analysis') {
+                    steps {
+                            container('nodejs') {
+                                  script {
+                                      withSonarQubeEnv('SonarServer') {
+                                        def sonarQubeSettings = """
+                                          sonar.host.url=${env.SONAR_HOST_URL}
+                                          sonar.token=${env.SONAR_AUTH_TOKEN}
+                                          sonar.sources=src
+                                        """
+                                        writeFile file: 'sonar-project.properties', text: sonarQubeSettings.trim()
+                                        sh "npm run sonar"
+                                    }
+                                }
+                            }
+                        }
+                  }
+                    stage('Quality gate check') {
+                              steps {
+                                        timeout(time: 5, unit: 'MINUTES') {
+                                                  waitForQualityGate(abortPipeline: true)
+                                        }
+                              }
+                    }
                   stage('Build Stage'){
                               when{ branch mainBranch }
                               steps{
@@ -109,7 +132,7 @@ pipeline{
                                                 sh """
                                                       git clone https://\${GIT_USER}:\${GIT_PASS}@github.com/MeetingTeam/${k8SRepoName}.git --branch ${mainBranch}
                                                       cd ${helmPath}
-                                                      sed -i 's|  tag: .*|  tag: "${imageVersion}"|' ${helmValueFile}
+                                                      sed -i "/imageTag:/s/:.*/: ${imageVersion}/" ${helmValueFile}
 
                                                       git config --global user.email "jenkins@gmail.com"
                                                       git config --global user.name "Jenkins"
