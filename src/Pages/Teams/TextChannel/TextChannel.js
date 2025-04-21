@@ -99,7 +99,7 @@ const TextChannel=({team, channel, channelInfo})=>{
                     {showVoting.type==3&&<CreateVoteModal teamId={team.id} nickName={user.nickName}  setShow={setShowVoting} channel={channel}/>}
                     <div className="chat-history">
                         <button className="btn btn-success" onClick={handleAddMessagesButton}>See more messages</button>
-                        <ul className="m-b-0">
+                        <ul className="mb-0">
                             {team.members&&channel.messages?.map((message)=>{
                                 let parentMessage=null;
                                 if(message.parentMessageId){
@@ -114,8 +114,8 @@ const TextChannel=({team, channel, channelInfo})=>{
                                         if(message.notShow) return;
                                         let creatorNickName=user.nickName;
                                         if(message.senderId!=user.id){
-                                            const sender=team.members.find((member)=>member.u.id==message.senderId).u;
-                                            creatorNickName=sender.nickName;
+                                            const sender=team.members.find((member)=>member.user.id==message.senderId)?.user;
+                                            if(sender) creatorNickName=sender.nickName;
                                         }
                                         return (<Voting key={message.id} message={message} setShow={setShowVoting} creatorNickName={creatorNickName}/>)
                                     }
@@ -168,9 +168,9 @@ const TextChannel=({team, channel, channelInfo})=>{
                                     <div className="col-lg-auto">
                                         <EmojiPickerPopover handleEmojiPicker={handleEmojiPicker}/>
                                     </div>
-                                    <div className="col-lg-auto">
+                                    {/* <div className="col-lg-auto">
                                            <button className="btn btn-sm btn-outline-info" onClick={(e)=>setShowVoting({type:3, message:null})}><i className="fa fa-check-square"></i></button>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 {replyMessage&&<ReplyAlert replyMessage={replyMessage} setReplyMessage={setReplyMessage}/>}
                                 <form className="input-group mb-0" onSubmit={(e)=>submitMessage(e)}>

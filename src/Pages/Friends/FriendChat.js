@@ -109,8 +109,8 @@ const FriendChat=({friend, indexChatFriend})=>{
                             </div>
                         </div>
                     <div className="chat-history">
-                        <button className="btn btn-success" onClick={handleAddMessagesButton}>See more messages</button>
-                        <ul className="m-b-0">
+                        <button className="btn btn-success mb-2" onClick={handleAddMessagesButton}>See more messages</button>
+                        <ul className="mb-0">
                             {friend.messages&&friend.messages.map((message)=>{
                                 let parentMessage=null;
                                 if(message.parentMessageId){
