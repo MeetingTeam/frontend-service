@@ -12,7 +12,9 @@ def helmValueFile = "values.dev.yaml"
 def githubAccount = 'github'
 def kanikoAccount = 'kaniko'
 
-def trivyReportFile = "report_trivy.html"
+def trivyReportFile = 'report_trivy.html'
+
+def sonarOrg = 'meetingteam'
 
 pipeline{
          agent {
@@ -47,7 +49,7 @@ pipeline{
                         steps {
                               container('sonar') {
                                     withSonarQubeEnv('SonarServer') {
-                                        sh "sonar-scanner -Dsonar.sources=src -Dsonar.projectKey=${appRepoName}"
+                                        sh "sonar-scanner -Dsonar.sources=src -Dsonar.projectKey=${appRepoName} -Dsonar.organization=${sonarOrg}"
                                    }
                             }
                         }
