@@ -24,6 +24,7 @@ const AccountActivation=()=>{
                       setError("Email is required");
                   }
                   Auth.resendSignUp(data.email)
+                    .then(()=> alertSuccess("Send OTP code successfully"))
                     .catch(err=> alertError(handleAmplifyError(err)));
           }
           function onSubmit(){

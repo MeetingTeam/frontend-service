@@ -56,16 +56,6 @@
     font-size: 15px
 }
       
-.teams-management .chat-list img {
-    width: 45px;
-    border-radius: 50%
-}
-      
-.teams-management img {
-    float: left;
-    border-radius: 50%
-}
-      
 .teams-management .about {
     float: left;
     padding-left: 8px
@@ -79,12 +69,6 @@
 .chat .chat-header {
     padding: 5px 2px !important;
     border-bottom: 2px solid #f4f7f6
-}
-      
-.chat .chat-header img {
-    float: left;
-    border-radius: 40px;
-    width: 40px
 }
       
 .chat .chat-header .chat-about {
@@ -113,11 +97,6 @@
       
 .chat .chat-history .message-data {
           margin-bottom: 15px
-}
-      
-.chat .chat-history .message-data img {
-          border-radius: 40px;
-          width: 40px
 }
       
 .chat .chat-history .message-data-time {

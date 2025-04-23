@@ -39,7 +39,7 @@ const TeamChat=({team, channel,channelInfo, setChannelInfo})=>{
                                         <div className="col-lg-6">
                                                 <Avatar src={team.urlIcon}/>
                                                   <div className="chat-about">
-                                                    <h6 className="m-b-0">{team.teamName}/{channel?channel.channelName:"TeamDetails"}</h6>
+                                                    <h6 className="mb-0">{team.teamName}/{channel?channel.channelName:"TeamDetails"}</h6>
                                                     {team.members&&<small>{team.members.length} members</small>}
                                                 </div>
                                         </div>
