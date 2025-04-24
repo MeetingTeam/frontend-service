@@ -41,15 +41,15 @@ pipeline{
                   stage('Test stage'){
                               steps{
                                         container('nodejs'){
-                                                  sh 'npm run test -- --coverage'
+                                                  sh 'npm run test'
                                         }
                               }
                   }
                   stage('Code analysis') {
                         steps {
-                              container('sonar') {
+                              container('maven') {
                                     withSonarQubeEnv('SonarServer') {
-                                        sh "sonar-scanner -Dsonar.sources=src -Dsonar.projectKey=${appRepoName} -Dsonar.organization=${sonarOrg}"
+                                        sh "mvn sonar:sonar -Dsonar.organization=${sonarOrg}"
                                    }
                             }
                         }
@@ -141,19 +141,5 @@ pipeline{
                 always {
                       archiveArtifacts artifacts: trivyReportFile, allowEmptyArchive: true, fingerprint: true
                 }
-                success {
-                        emailext(
-                            subject: "Build Success: ${currentBuild.fullDisplayName}",
-                            body: "The build completed successfully!. Check the logs and artifacts if needed.",
-                            to: '22520527@gm.uit.edu.vn'
-                        )
-                }
-                failure {
-                        emailext(
-                                    subject: "Build Failed: ${currentBuild.fullDisplayName}",
-                                    body: "The build has failed. Please check the logs for more information.",
-                                    to: '22520527@gm.uit.edu.vn'
-                            )
-                }
-        }
+            }
 }
