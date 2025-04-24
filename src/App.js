@@ -11,7 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import ZegoMeeting from './Pages/VideoCall/ZegoMeeting.js';
 import { configAmplify } from './Configs/AmplifyConfig.js';
 
-// This is the App function
+// This is the starting point of the app
 function App() {
   configAmplify(true);
   return (
