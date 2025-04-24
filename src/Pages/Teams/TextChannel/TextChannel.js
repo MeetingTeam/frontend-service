@@ -20,6 +20,7 @@ import ReactionDetails from "../../../Components/Message/ReactionDetails.js";
 import EmojiPickerPopover from "../../../Components/ChatControl/EmojiPickerPopover.js";
 import { alertError } from "../../../Utils/ToastUtil.js";
 
+// Update some thing
 const TextChannel=({team, channel, channelInfo})=>{
             const dispatch=useDispatch();
             const user=useSelector(state=>state.user);
