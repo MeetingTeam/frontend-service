@@ -47,9 +47,9 @@ pipeline{
                   }
                   stage('Code analysis') {
                         steps {
-                              container('maven') {
+                              container('sonar') {
                                     withSonarQubeEnv('SonarServer') {
-                                        sh "mvn sonar:sonar -Dsonar.organization=${sonarOrg}"
+                                        sh "sonar-scanner -Dsonar.sources=src -Dsonar.projectKey=${appRepoName} -Dsonar.organization=${sonarOrg}"
                                    }
                             }
                         }
