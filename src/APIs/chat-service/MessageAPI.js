@@ -16,17 +16,15 @@ class MessageAPI {
         return AxiosService.put(`${messageEndpoint}/unsend/${messageId}`);
     }
 
-    getPrivateMessages(receivedMessageNum, friendId){
-        return AxiosService.get(`${messageEndpoint}/private`, {
-            receivedMessageNum,
-            friendId
+    getFriendMessages(receivedMessageNum, friendId){
+        return AxiosService.get(`${messageEndpoint}/friend/${friendId}`, {
+            receivedMessageNum
         });
     }
 
     getTextChannelMessages(receivedMessageNum, channelId){
-        return AxiosService.get(`${messageEndpoint}/text_channel`, {
-            receivedMessageNum,
-            channelId
+        return AxiosService.get(`${messageEndpoint}/text_channel/${channelId}`, {
+            receivedMessageNum
         });
     }
 }

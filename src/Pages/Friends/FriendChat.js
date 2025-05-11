@@ -1,22 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import { getDateTime, getTimeDistance } from "../../Utils/DateTimeUtil.js";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MessageDropdown from "../../Components/Message/MessageDropdown.js";
 import ReplyAlert from "../../Components/Message/ReplyAlert.js";
 import { loadMoreMessages } from "../../Redux/friendsReducer.js";
-import EmojiPicker from "emoji-picker-react";
 import MessageType from "../../Components/Message/MessageType.js";
 import Avatar from "../../Components/Avatar/Avartar.js";
 import UnfriendModal from "./Components/UnfriendModal.js";
 import MessageAPI from "../../APIs/chat-service/MessageAPI.js";
-import { useSnackbarUtil } from "../../Utils/SnackbarUtil.js";
 import { handleAxiosError } from "../../Utils/ErrorUtil.js";
 import ReactionDetails from "../../Components/Message/ReactionDetails.js";
 import ReactionList from "../../Components/Message/ReactionList.js";
 import MediaFileAPI from "../../APIs/chat-service/MediaFileAPI.js";
 import EmojiPickerPopover from "../../Components/ChatControl/EmojiPickerPopover.js";
-
+import { alertError, alertSuccess } from "../../Utils/ToastUtil.js";
 
 const FriendChat=({friend, indexChatFriend})=>{
           const dispatch=useDispatch();
@@ -28,7 +26,7 @@ const FriendChat=({friend, indexChatFriend})=>{
           
           useEffect(()=>{
                 if(!friend.messages){
-                    MessageAPI.getPrivateMessages(0, friend.id).then(res=>{
+                    MessageAPI.getFriendMessages(0, friend.id).then(res=>{
                         dispatch(loadMoreMessages({messages: res.data,friendIndex: indexChatFriend}))
                     })
                     .catch(err=>alertError(handleAxiosError(err)));
@@ -52,7 +50,7 @@ const FriendChat=({friend, indexChatFriend})=>{
           }
           function handleAddMessagesButton(){
                let messagesNum=friend.messages?friend.messages.length:0;
-               MessageAPI.getPrivateMessages(messagesNum, friend.id).then(res=>{
+               MessageAPI.getFriendMessages(messagesNum, friend.id).then(res=>{
                         dispatch(loadMoreMessages({
                             messages: res.data, 
                             friendIndex: indexChatFriend
