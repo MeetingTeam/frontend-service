@@ -50,7 +50,7 @@ export function getScheduledTime(meeting){
 }
 
 export function getDate(luxonDateTime) {
-          if (!inputDate) return null;
+          if (!luxonDateTime) return null;
           return luxonDateTime.toISODate();
 }
 

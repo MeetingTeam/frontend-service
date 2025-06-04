@@ -1,5 +1,5 @@
+import { MEETING_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 import AxiosService from "../../Services/AxiosService.js";
-import { MEETING_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const zegoEndpoint= MEETING_SERVICE_ENDPOINT+"/zegocloud";
 class ZegoAPI {

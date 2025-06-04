@@ -1,7 +1,7 @@
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import { getAccessToken } from "../Utils/TokenUtil.js";
-import { WEBSOCKET_SERVICE_ENDPOINT } from "../Utils/EnvStore.js";
+import CognitoService from "./CognitoService.js";
+import { WEBSOCKET_SERVICE_ENDPOINT } from "../Configs/EnvConfig.js";
 
 class WebsocketService {
   constructor() {
@@ -18,7 +18,7 @@ class WebsocketService {
       this.stompClient = Stomp.over(this.sock);
       this.stompClient.debug = null
       
-      const jwtToken= await getAccessToken()
+      const jwtToken= await CognitoService.getAccessToken()
 
       this.stompClient.connect(
         { "Authorization": jwtToken }, 

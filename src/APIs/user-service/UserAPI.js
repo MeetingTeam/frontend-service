@@ -1,7 +1,7 @@
+import { USER_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 import AxiosService from "../../Services/AxiosService.js";
-import { USER_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
-const userEndpoint=USER_SERVICE_ENDPOINT+"/user";
+const userEndpoint = USER_SERVICE_ENDPOINT+"/user";
 
 class UserAPI {
           addUser(createUserDto){

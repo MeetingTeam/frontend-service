@@ -4,7 +4,7 @@ WORKDIR /run
 
 ## copy files
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY build /run/html
+COPY dist /run/html
 
 ## set permissions
 RUN chown -R nginx:nginx /run

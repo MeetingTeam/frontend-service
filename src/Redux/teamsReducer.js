@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { messageTypes } from "../Utils/Constraints.js";
+import { messageTypes } from "../Configs/Constraints.js";
 
 const teamsReducer=createSlice({
           name: "teams",

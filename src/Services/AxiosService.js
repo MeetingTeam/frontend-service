@@ -1,6 +1,6 @@
 import axios from "axios";
 import { alertInfo } from "../Utils/ToastUtil.js";
-import { getAccessToken } from "../Utils/TokenUtil.js";
+import CognitoService from "./CognitoService.js";
 
 class AxiosService{
           constructor(){
@@ -19,9 +19,8 @@ class AxiosService{
                     const res=err.response;       
                     if(res&&res.status==401){
                               if(!this.isTokenExpired){
-                                        // this.isTokenExpired=true;
-                                        // window.location.replace("/login");
-                                        alertInfo("Token has been expired. Please login again")
+                                        this.isTokenExpired=true;
+                                        window.location.replace("/login");
                               }
                     }
                     else return Promise.reject(err);
@@ -30,7 +29,7 @@ class AxiosService{
           
           async get(url, params){
                     console.log("params", params);
-                    const accessToken= await getAccessToken();
+                    const accessToken= await CognitoService.getAccessToken();
                     return this.instance.get(url,{
                               headers: { 'Authorization': accessToken },
                               params: params
@@ -38,7 +37,7 @@ class AxiosService{
           }
           
           async post(url, body, params) {
-                    const accessToken= await getAccessToken();
+                    const accessToken= await CognitoService.getAccessToken();
                    return this.instance.post(url, body,{
                                         headers: {
                                                   'Content-Type': 'application/json',
@@ -49,7 +48,7 @@ class AxiosService{
           }
           
           async put(url, body, params){
-                    const accessToken= await getAccessToken();
+                    const accessToken= await CognitoService.getAccessToken();
                     return this.instance.put(url, body,{
                                         headers: { 
                                                   'Content-Type': 'application/json',
@@ -61,7 +60,7 @@ class AxiosService{
           }
 
           async patch(url, body, params){
-                    const accessToken= await getAccessToken();
+                    const accessToken= await CognitoService.getAccessToken();
                     return this.instance.patch(url,body,{
                               headers: { 
                                         'Content-Type': 'application/json',
@@ -72,7 +71,7 @@ class AxiosService{
           }
           
           async delete(url, params){
-                    const accessToken= await getAccessToken();
+                    const accessToken= await CognitoService.getAccessToken();
                     return this.instance.delete(url,{
                               headers: { 'Authorization': accessToken },
                               params: params

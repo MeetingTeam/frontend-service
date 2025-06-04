@@ -1,5 +1,5 @@
+import { CHAT_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 import AxiosService from "../../Services/AxiosService.js";
-import { CHAT_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const votingEndpoint= CHAT_SERVICE_ENDPOINT+"/voting"
 class VotingAPI {
