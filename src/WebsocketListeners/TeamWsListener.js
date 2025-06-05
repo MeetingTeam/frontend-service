@@ -1,6 +1,6 @@
 import { addChannel, addMeeting, addMembers, addTeamChatMessage, deleteMeeting, deleteMember, removeChannel, updateTeam } from "../Redux/teamsReducer.js";
 import WebSocketService from "../Services/WebSocketService.js";
-import { wsTopics } from "../Utils/Constraints.js";
+import { wsTopics } from "../Configs/Constraints.js";
 
 export function subscribeToTeamTopics(team, dispatch){
           const dest="/topic/team."+team.id;

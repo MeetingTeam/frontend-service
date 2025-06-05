@@ -13,7 +13,7 @@ export function handleAxiosError(axiosError){
           return errorMessage;
 }
 
-export function handleAmplifyError(amplifyError){
-          if(!amplifyError.message) return "Unknown error";
-          return amplifyError.message;
+export function handleCognitoError(cognitoError){
+          if(!cognitoError.message) return "Unknown error";
+          return cognitoError.message;
 }

@@ -1,5 +1,5 @@
+import { TEAM_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 import AxiosService from "../../Services/AxiosService.js";
-import { TEAM_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const channelEndpoint = TEAM_SERVICE_ENDPOINT+"/channel";
 

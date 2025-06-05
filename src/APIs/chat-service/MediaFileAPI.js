@@ -1,7 +1,6 @@
 import axios from "axios";
 import AxiosService from "../../Services/AxiosService.js";
-import { CHAT_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
-import MessageAPI from "./MessageAPI.js";
+import { CHAT_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 
 const mediaFileEndpoint= CHAT_SERVICE_ENDPOINT+"/media-file";
 class MediaFileAPI {

@@ -1,5 +1,5 @@
+import { USER_SERVICE_ENDPOINT } from "../../Configs/EnvConfig.js";
 import AxiosService from "../../Services/AxiosService.js";
-import { USER_SERVICE_ENDPOINT } from "../../Utils/EnvStore.js";
 
 const friendRequestEndpoint = USER_SERVICE_ENDPOINT+"/friend-request";
 

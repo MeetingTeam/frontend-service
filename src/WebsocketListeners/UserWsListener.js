@@ -1,7 +1,7 @@
 import { addFriendChatMessage, deleteFriend, updateFriends } from "../Redux/friendsReducer.js";
 import { deleteTeam, updateTeam } from "../Redux/teamsReducer.js";
 import WebSocketService from "../Services/WebSocketService.js";
-import { wsTopics } from "../Utils/Constraints.js";
+import { wsTopics } from "../Configs/Constraints.js";
 
 export function subscribeToUserTopics(user, dispatch){
           const dest= "/topic/user."+user.id;
