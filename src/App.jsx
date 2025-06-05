@@ -9,12 +9,14 @@ import ZegoMeeting from './Pages/VideoCall/ZegoMeeting.jsx'
 import ClientRouter from './Routers/ClientRouter.jsx'
 import ChangePasswordPage from './Pages/Auth/ChangePasswordPage.jsx'
 import AccountActivationPage from './Pages/Auth/AccountActivationPage.jsx'
+import DashboardPage from './Pages/Dashboard/DashboardPage.jsx'
 
 function App() {
   return (
         <BrowserRouter>
             <ToastContainer/>
                 <Routes>
+                    <Route path="/" element={<DashboardPage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/register" element={<RegisterPage/>}/>
                     <Route path="/changePassword" element={<ChangePasswordPage/>}/>

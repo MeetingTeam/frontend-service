@@ -14,7 +14,6 @@ const ClientRouter=()=>{
           <DataLoading>
                     <Navbar/>
                     <Routes>
-                              <Route path="/" element={<DashboardPage/>}/>
                               <Route path="/friendsPage" element={<FriendsPage/>}/>
                               <Route path="/teams" element={<TeamsPage/>}/>
                               <Route path="/userSettings" element={<UserSettings/>}/>
