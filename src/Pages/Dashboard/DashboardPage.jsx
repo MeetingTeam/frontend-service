@@ -1,17 +1,12 @@
+import { Link } from "react-router-dom";
+import "./Dashboard.css"
+
 const DashboardPage = () =>(
-          <div
-              style={{
-                 display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "15px"
-              }}
-          >
-              <h3 style={{ marginBottom: "20px" }}>Meeting Team</h3>
-              <div className="border border-dark rounded" style={{padding:"30px"}}>
+          <div className="dashboard-layout">
+              <h3 className="mb-3">Meeting Team</h3>
+              <div className="border border-dark rounded p-4">
                       <h5>Author: HungTran - Email: tienhung17092004@gmail.com</h5>
-                      <h5 style={{ fontStyle: "italic" }}> A personal website about chat and video call application</h5>
+                      <h5 className="fst-italic"> A personal website about chat and video call application</h5>
                       <ol>
                               <li>The "Friends" tab shows list of active friends</li>
                               <li>The "Teams" tab shows list of teams you have joined in</li>
@@ -19,6 +14,10 @@ const DashboardPage = () =>(
                               <li>The "Calendar" tab shows your upcoming meetings</li>
                       </ol>
               </div>
+
+            <div className="call-to-action">
+                <p>To get started, please <Link to="/login">log in</Link> or <Link to="/register">create an account</Link>.</p>
+            </div>
           </div>
     );
 export default DashboardPage;
