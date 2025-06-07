@@ -5,7 +5,7 @@ const DashboardPage = () =>(
           <div className="dashboard-layout">
               <h3 className="mb-3">Meeting Team</h3>
               <div className="border border-dark rounded p-4">
-                      <h5>Author: Q.Hung&T.Hung - Email: 22520527@gm.uit.edu.vn&22520524@gm.uit.edu.vn</h5>
+                      <h5>Author: HungTran - Email: 22520527@gm.uit.edu.vn</h5>
                       <h5 className="fst-italic"> A personal website about chat and video call application</h5>
                       <ol>
                               <li>The "Friends" tab shows list of active friends</li>
