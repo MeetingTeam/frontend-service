@@ -1,11 +1,10 @@
-import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import CognitoService from "./CognitoService.js";
 import { WEBSOCKET_SERVICE_ENDPOINT } from "../Configs/EnvConfig.js";
 
 class WebsocketService {
   constructor() {
-    this.sock = null;
+    this.ws = null;
     this.stompClient = null;
     this.subscriptions = new Map();
     this.timeInterval = 3000;
@@ -13,9 +12,9 @@ class WebsocketService {
   }
 
   async connect() {
-    if (!this.sock || this.sock.readyState === SockJS.CLOSED) {
-      this.sock = new SockJS(this.websocketEndpoint);
-      this.stompClient = Stomp.over(this.sock);
+    if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
+      this.ws = new WebSocket(`${WEBSOCKET_SERVICE_ENDPOINT}/wss`);
+      this.stompClient = Stomp.over(this.ws);
       this.stompClient.debug = null
       
       const jwtToken= await CognitoService.getAccessToken()
