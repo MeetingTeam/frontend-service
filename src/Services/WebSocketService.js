@@ -8,12 +8,12 @@ class WebsocketService {
     this.stompClient = null;
     this.subscriptions = new Map();
     this.timeInterval = 3000;
-    this.websocketEndpoint = `${WEBSOCKET_SERVICE_ENDPOINT}/wss`;
+    this.websocketEndpoint = `ws://${window.location.host}${WEBSOCKET_SERVICE_ENDPOINT}/wss`;
   }
 
   async connect() {
     if (!this.ws || this.ws.readyState === WebSocket.CLOSED) {
-      this.ws = new WebSocket(`${WEBSOCKET_SERVICE_ENDPOINT}/wss`);
+      this.ws = new WebSocket(this.websocketEndpoint);
       this.stompClient = Stomp.over(this.ws);
       this.stompClient.debug = null
       
